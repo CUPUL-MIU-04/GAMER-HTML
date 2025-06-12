@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adivina el Número</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .game-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 60px;
+            text-align: center;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+            color: #d35400;
+        }
+        #attempts {
+            color: #7f8c8d;
+        }
+        .credits {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        /* Estilos para el anti-adblock */
+        #adblock-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        #adblock-alert {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            text-align: center;
+        }
+        #adblock-alert h2 {
+            color: #d35400;
+            margin-top: 0;
+        }
+        #adblock-alert button {
+            margin-top: 20px;
+        }
+        .blur-content {
+            filter: blur(5px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Overlay de adblock -->
+    <div id="adblock-overlay">
+        <div id="adblock-alert">
+            <h2>¡AdBlock Detectado!</h2>
+            <p>Hemos detectado que estás usando un bloqueador de anuncios.</p>
+            <p>Para apoyar nuestro sitio y continuar jugando, por favor:</p>
+            <ol style="text-align: left; display: inline-block; margin: 10px auto;">
+                <li>Desactiva tu AdBlock</li>
+                <li>O añade nuestro sitio a tu lista blanca</li>
+            </ol>
+            <button id="recheck-btn">Ya lo he desactivado</button>
+        </div>
+    </div>
+
+    <div id="game-content" class="game-container">
+        <h1>Adivina el Número</h1>
+        <p>Ingresa un número entre 1 y 100:</p>
+        <input type="number" id="guessInput" min="1" max="100">
+        <button onclick="checkGuess()">Adivinar</button>
+        <div id="message"></div>
+        <div id="attempts">Intentos: 0</div>
+    </div>
+    
+    <div class="credits">Creado por Luis04</div>
+
+    <script>
+        // ===== ANTI-ADBLOCK =====
+        function detectAdBlock() {
+            return new Promise((resolve) => {
+                // Método 1: Intentar cargar un script de anuncios
+                const adScript = document.createElement('script');
+                adScript.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+                adScript.onerror = () => resolve(true);
+                document.head.appendChild(adScript);
+                setTimeout(() => document.head.removeChild(adScript), 200);
+                
+                // Método 2: Crear un elemento con clases de anuncios
+                const testAd = document.createElement('div');
+                testAd.innerHTML = '&nbsp;';
+                testAd.className = 'adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads';
+                testAd.style.position = 'absolute';
+                testAd.style.left = '-9999px';
+                document.body.appendChild(testAd);
+                
+                setTimeout(() => {
+                    if(testAd.offsetHeight === 0 || window.getComputedStyle(testAd).display === 'none') {
+                        document.body.removeChild(testAd);
+                        resolve(true);
+                    } else {
+                        document.body.removeChild(testAd);
+                        // Método 3: Verificar si fetch es bloqueado
+                        fetch('https://www.google-analytics.com/analytics.js', {
+                            method: 'HEAD',
+                            mode: 'no-cors'
+                        }).catch(() => resolve(true));
+                        
+                        // Si todo pasa, no hay adblock
+                        setTimeout(() => resolve(false), 300);
+                    }
+                }, 100);
+            });
+        }
+        
+        async function checkAdBlock() {
+            const isAdBlockActive = await detectAdBlock();
+            if(isAdBlockActive) {
+                document.getElementById('adblock-overlay').style.display = 'flex';
+                document.getElementById('game-content').classList.add('blur-content');
+            } else {
+                document.getElementById('adblock-overlay').style.display = 'none';
+                document.getElementById('game-content').classList.remove('blur-content');
+            }
+            return isAdBlockActive;
+        }
+        
+        // Verificar periódicamente
+        document.getElementById('recheck-btn').addEventListener('click', () => {
+            checkAdBlock();
+        });
+        
+        // Verificar al cargar y cada 30 segundos
+        window.addEventListener('load', () => {
+            checkAdBlock();
+            setInterval(checkAdBlock, 30000);
+        });
+        
+        // ===== JUEGO =====
+        let randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const guessInput = document.getElementById('guessInput');
+            const message = document.getElementById('message');
+            const attemptsDisplay = document.getElementById('attempts');
+            const guess = parseInt(guessInput.value);
+
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                message.textContent = "¡Por favor ingresa un número válido entre 1 y 100!";
+                return;
+            }
+
+            attempts++;
+            attemptsDisplay.textContent = `Intentos: ${attempts}`;
+
+            if (guess === randomNumber) {
+                message.textContent = `¡Felicidades! Adivinaste el número ${randomNumber} en ${attempts} intentos.`;
+                message.style.color = "#27ae60";
+                guessInput.disabled = true;
+            } else if (guess < randomNumber) {
+                message.textContent = "El número es mayor. ¡Sigue intentando!";
+                message.style.color = "#d35400";
+            } else {
+                message.textContent = "El número es menor. ¡Sigue intentando!";
+                message.style.color = "#d35400";
+            }
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+    </script>
+</body>
+</html>
