@@ -6,13 +6,13 @@
 
 **Colección de juegos clásicos** creados con tecnologías web. Perfecta para aprender desarrollo frontend mientras te diviertes.
 
-<img src="https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Snake-Multiplataforma/assets/Snake-Multiplataforma.png" width="200" height="500" /> 
+![Captura de pantalla del repositorio](https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Snake-Multiplataforma/assets/Snake-Multiplataforma2.png)
 
-<img src="https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Juego-del-Ahorcado/assets/Juego-del-Ahorcado.png" width="200" height="500" />
+![Captura de pantalla del repositorio](https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Juego-del-Ahorcado/assets/Juego-del-Ahorcado2.png)
 
-<img src="https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Adivina-la-Carta/assets/Adivina-la-Carta.png" width="200" height="500" />
+![Captura de pantalla del repositorio](https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Adivina-la-Carta/assets/Adivina-la-Carta2.png)
 
-<img src="https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Adivina-el-N%C3%BAmero/assets/Adivina-el-N%C3%BAmero.png" width="200" height="500" />
+![Captura de pantalla del repositorio](https://github.com/CUPUL-MIU-04/GAMER-HTML/blob/master/Adivina-el-N%C3%BAmero/assets/Adivina-el-N%C3%BAmero2.png)
 
 Created by **Luis04**  
 Creado por **Luis04**
