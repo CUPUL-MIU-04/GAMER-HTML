@@ -1,15 +1,339 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Juegos HTML</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juegos HTML - Colección de Juegos Clásicos</title>
+    <meta name="description" content="Colección de juegos clásicos creados con HTML, CSS y JavaScript. Disfruta de juegos como Snake, Ahorcado, Adivina la Carta y más.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --dark-color: #2d3436;
+            --light-color: #f5f6fa;
+            --success-color: #00b894;
+            --error-color: #d63031;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark-color);
+            min-height: 100vh;
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .subtitle {
+            color: var(--dark-color);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+        
+        .game-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .game-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
+        }
+        
+        .game-info {
+            padding: 1.5rem;
+        }
+        
+        .game-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+        }
+        
+        .game-desc {
+            color: var(--dark-color);
+            opacity: 0.8;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .play-btn {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .game-card:hover .play-btn {
+            background-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--dark-color);
+            opacity: 0.7;
+        }
+        
+        /* Estilos para el anti-adblock */
+        #adblock-detector {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        #adblock-detector h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+        
+        #adblock-detector p {
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+        
+        #adblock-detector button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #adblock-detector button:hover {
+            background-color: var(--accent-color);
+            transform: scale(1.05);
+        }
+        
+        .test-ad {
+            width: 1px;
+            height: 1px;
+            position: absolute;
+            left: -100px;
+            top: -100px;
+            visibility: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            #adblock-detector h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Mis Juegos</h1>
-    <ul>
-        <li><a href="Adivina-la-Carta/Adivina-la-Carta.html">Adivina la Carta</a></li>
-        <li><a href="Snake-Multiplataforma/Snake-Multiplataforma.html">Snake</a></li>
-        <li><a href="Juego-del-Ahorcado/Juego-del-Ahorcado.html">Ahorcado</a></li>
-        <li><a href="Adivina-el-Número/Adivina-el-Número.html">Adivina el Número</a></li>
-    </ul>
+    <!-- Elemento para detectar AdBlock -->
+    <div class="test-ad" id="adBlockBait"> 
+        <div class="ad" style="width: 1px; height: 1px; background: transparent;"></div>
+    </div>
+    
+    <!-- Popup de detección de AdBlock -->
+    <div id="adblock-detector">
+        <h2>¡AdBlock Detectado!</h2>
+        <p>Hemos detectado que estás usando un bloqueador de anuncios. Este sitio se mantiene gracias a la publicidad. Por favor, desactiva tu AdBlock para continuar disfrutando de nuestros juegos.</p>
+        <p>Después de desactivarlo, recarga la página para continuar.</p>
+        <button onclick="location.reload()">Ya desactivé AdBlock</button>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Mis Juegos HTML</h1>
+            <p class="subtitle">Una colección de juegos clásicos creados con HTML, CSS y JavaScript. ¡Diviértete jugando!</p>
+        </header>
+        
+        <div class="games-grid">
+            <div class="game-card">
+                <a href="Adivina-la-Carta/Adivina-la-Carta.html">
+                    <div class="game-image" style="background-image: url('https://images.unsplash.com/photo-1516550893923-42d28e5677af?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="game-info">
+                        <h3 class="game-title">Adivina la Carta</h3>
+                        <p class="game-desc">¿Podrás adivinar si la próxima carta será mayor o menor? Pon a prueba tu intuición en este emocionante juego de cartas.</p>
+                        <span class="play-btn">Jugar Ahora</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="game-card">
+                <a href="Snake-Multiplataforma/Snake-Multiplataforma.html">
+                    <div class="game-image" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="game-info">
+                        <h3 class="game-title">Snake Clásico</h3>
+                        <p class="game-desc">El clásico juego de la serpiente. Come la mayor cantidad de frutas posible sin chocar contra las paredes o contra ti mismo.</p>
+                        <span class="play-btn">Jugar Ahora</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="game-card">
+                <a href="Juego-del-Ahorcado/Juego-del-Ahorcado.html">
+                    <div class="game-image" style="background-image: url('https://images.unsplash.com/photo-1509228627152-72ae9ae6848d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="game-info">
+                        <h3 class="game-title">Ahorcado</h3>
+                        <p class="game-desc">Adivina la palabra letra por letra antes de que se complete el dibujo del ahorcado. ¡Pon a prueba tu vocabulario!</p>
+                        <span class="play-btn">Jugar Ahora</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="game-card">
+                <a href="Adivina-el-Número/Adivina-el-Número.html">
+                    <div class="game-image" style="background-image: url('https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="game-info">
+                        <h3 class="game-title">Adivina el Número</h3>
+                        <p class="game-desc">Intenta adivinar el número secreto en la menor cantidad de intentos posible. ¡Cada pista te acerca a la victoria!</p>
+                        <span class="play-btn">Jugar Ahora</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2025 Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
+        </footer>
+    </div>
+
+    <script>
+        // Detección de AdBlock
+        function detectAdBlock() {
+            return new Promise((resolve) => {
+                const ad = document.getElementById('adBlockBait');
+                const testAd = ad.querySelector('.ad');
+                
+                // Comprobamos si el AdBlock ha ocultado el anuncio de prueba
+                setTimeout(() => {
+                    const isBlocked = testAd.offsetHeight === 0 || 
+                                     testAd.style.height === '0px' || 
+                                     window.getComputedStyle(testAd).display === 'none';
+                    resolve(isBlocked);
+                }, 100);
+            });
+        }
+        
+        // Mostrar advertencia si se detecta AdBlock
+        async function checkAdBlock() {
+            const isAdBlockActive = await detectAdBlock();
+            if (isAdBlockActive) {
+                document.getElementById('adblock-detector').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        
+        // Ejecutar la comprobación al cargar la página
+        window.addEventListener('load', checkAdBlock);
+        
+        // También comprobar periódicamente por si activan AdBlock después de cargar
+        setInterval(checkAdBlock, 5000);
+    </script>
 </body>
 </html>
