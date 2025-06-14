@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="google-adsense-account" content="ca-pub-3869365676003245">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juegos HTML - Colección de Juegos Clásicos</title>
@@ -219,6 +218,26 @@
             visibility: hidden;
         }
         
+        /* Estilos para los anuncios */
+        .ad-container {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .ad-container.horizontal {
+            width: 100%;
+        }
+        
+        .ad-container.vertical {
+            float: right;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -235,28 +254,51 @@
             #adblock-detector h2 {
                 font-size: 1.5rem;
             }
+            
+            .ad-container.vertical {
+                float: none;
+                margin-left: 0;
+                margin: 1rem auto;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Elemento para detectar AdBlock -->
+    <!-- Elementos para detectar AdBlock mejorado -->
     <div class="test-ad" id="adBlockBait"> 
         <div class="ad" style="width: 1px; height: 1px; background: transparent;"></div>
     </div>
+    <div id="fakeAd" style="position: absolute; left: -9999px; top: -9999px;" class="adsbox ad-placement ad-unit"></div>
     
-    <!-- Popup de detección de AdBlock -->
-    <div id="adblock-detector">
-        <h2>¡AdBlock Detectado!</h2>
-        <p>Hemos detectado que estás usando un bloqueador de anuncios. Este sitio se mantiene gracias a la publicidad. Por favor, desactiva tu AdBlock para continuar disfrutando de nuestros juegos.</p>
-        <p>Después de desactivarlo, recarga la página para continuar.</p>
-        <button onclick="location.reload()">Ya desactivé AdBlock</button>
-    </div>
+<!-- HTML para el detector de AdBlock -->
+<div id="adblock-detector" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; color: white; text-align: center; padding: 20px;">
+    <h2 style="color: #ff5252; margin-bottom: 20px;">¡Bloqueador de Anuncios Detectado!</h2>
+    <!-- Imagen de advertencia (reemplaza la URL) -->
+    <img src="https://example.com/adblock-warning.png" alt="AdBlock Detectado" style="max-width: 200px; margin: 20px auto; display: block;">
+    <p style="margin-bottom: 15px; max-width: 600px;">Hemos detectado que estás usando un bloqueador de anuncios. Este sitio depende de la publicidad para ofrecer contenido gratuito.</p>
+    <p style="margin-bottom: 25px; max-width: 600px;">Por favor, desactiva tu bloqueador de anuncios y recarga la página para continuar.</p>
+    <button style="background-color: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; transition: all 0.3s;">Ya desactivé el bloqueador</button>
+</div>
     
     <div class="container">
         <header>
             <h1>Mis Juegos HTML</h1>
             <p class="subtitle">Una colección de juegos clásicos creados con HTML, CSS y JavaScript. ¡Diviértete jugando!</p>
         </header>
+        
+        <!-- Primer anuncio horizontal -->
+        <div class="ad-container horizontal">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <!-- ads -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:550px;height:50px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="6790058992"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
         
         <div class="games-grid">
             <div class="game-card">
@@ -320,42 +362,313 @@
             </div>
         </div>
         
+        <!-- Segundo anuncio vertical -->
+        <div class="ad-container vertical">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:360px;height:150px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="8675622789"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
         <footer>
             <p>© 2023 Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
 
-    <script>
-        // Detección de AdBlock
-        function detectAdBlock() {
-            return new Promise((resolve) => {
-                const ad = document.getElementById('adBlockBait');
-                const testAd = ad.querySelector('.ad');
+<script>
+// Sistema Anti-AdBlock Ultra Extremo Mejorado
+(function() {
+    // Configuración mejorada
+    const config = {
+        checkInterval: 10000, // 10 segundos entre verificaciones
+        maxChecks: 3,        // Máximo de verificaciones antes de bloqueo permanente
+        cookieName: 'adblock_bypass', // Nombre de la cookie de bypass
+        cookieDays: 1,       // Días de validez para el bypass
+        debug: false,        // Modo debug (muestra logs en consola)
+        requiredVisibleAds: 1 // Mínimo de anuncios que deben mostrarse
+    };
+
+    // Estado del sistema mejorado
+    let checkCount = 0;
+    let adBlockDetected = false;
+    let permanentBlock = false;
+    let bypassEnabled = document.cookie.includes(config.cookieName + "=true");
+
+    // Métodos de detección ultra precisos
+    const detectionMethods = {
+        // 1. Verificación de scripts de anuncios (mejorada)
+        checkAdScripts: function() {
+            const requiredScripts = [
+                'adsbygoogle.js',
+                'gpt.js',
+                'pagead/js/adsbygoogle',
+                'doubleclick.net'
+            ];
+            
+            const scripts = Array.from(document.scripts);
+            return !requiredScripts.some(req => 
+                scripts.some(s => s.src.includes(req) && s.loaded)
+            );
+        },
+
+        // 2. Elementos de prueba con clases avanzadas
+        checkTestElements: function() {
+            const testClasses = [
+                'ad', 'ads', 'advert', 'ad-container', 'ad-banner', 
+                'ad-unit', 'ad-placeholder', 'ad-wrapper', 'ad-box', 
+                'advertisement', 'AdSense', 'pub_300x250', 'text-ad'
+            ];
+            
+            const testContainer = document.createElement('div');
+            testContainer.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+            
+            testClasses.forEach(cls => {
+                const el = document.createElement('div');
+                el.className = cls;
+                el.innerHTML = '&nbsp;';
+                el.style.width = '1px';
+                el.style.height = '1px';
+                testContainer.appendChild(el);
+            });
+            
+            document.body.appendChild(testContainer);
+            
+            const blockedCount = Array.from(testContainer.children).filter(el => 
+                el.offsetHeight === 0 || 
+                window.getComputedStyle(el).display === 'none' ||
+                window.getComputedStyle(el).visibility === 'hidden'
+            ).length;
+            
+            document.body.removeChild(testContainer);
+            return blockedCount > (testClasses.length * 0.7); // 70% bloqueados
+        },
+
+        // 3. Verificación de peticiones mejorada
+        checkBlockedRequests: async function() {
+            const endpoints = [
+                'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+                'https://securepubads.g.doubleclick.net/tag/js/gpt.js',
+                'https://www.googletagservices.com/tag/js/gpt.js'
+            ];
+            
+            const results = await Promise.all(endpoints.map(async url => {
+                try {
+                    const response = await fetch(url, {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-store',
+                        credentials: 'omit'
+                    });
+                    return !response.ok;
+                } catch {
+                    return true;
+                }
+            });
+            
+            return results.filter(Boolean).length > (endpoints.length * 0.7);
+        },
+
+        // 4. Verificación de anuncios visibles (mejorada)
+        checkVisibleAds: function() {
+            const adSelectors = [
+                'ins.adsbygoogle',
+                'div[id*="ad-"]:not(#adblock-detector)',
+                'div[class*="ad-"]:not(.ad-container)',
+                'iframe[src*="ads"]',
+                'div[id*="Ad"]'
+            ];
+            
+            const ads = Array.from(document.querySelectorAll(adSelectors.join(',')));
+            const visibleAds = ads.filter(ad => 
+                ad.offsetHeight > 10 && 
+                window.getComputedStyle(ad).display !== 'none' &&
+                window.getComputedStyle(ad).visibility !== 'hidden'
+            ).length;
+            
+            return visibleAds < config.requiredVisibleAds && ads.length > 0;
+        },
+
+        // 5. Verificación profunda de API (mejorada)
+        checkAdAPI: function() {
+            try {
+                // Verificación de objetos globales de anuncios
+                if (typeof google_tag_manager === 'undefined' ||
+                    typeof adsbygoogle === 'undefined') {
+                    return true;
+                }
                 
-                // Comprobamos si el AdBlock ha ocultado el anuncio de prueba
-                setTimeout(() => {
-                    const isBlocked = testAd.offsetHeight === 0 || 
-                                     testAd.style.height === '0px' || 
-                                     window.getComputedStyle(testAd).display === 'none';
-                    resolve(isBlocked);
-                }, 100);
+                // Verificación de manipulación
+                const originalPush = adsbygoogle.push;
+                let detectionFlag = false;
+                
+                Object.defineProperty(adsbygoogle, 'push', {
+                    value: function() {
+                        detectionFlag = true;
+                        return originalPush.apply(this, arguments);
+                    },
+                    writable: false,
+                    configurable: false
+                });
+                
+                adsbygoogle.push = originalPush;
+                return detectionFlag;
+            } catch {
+                return true;
+            }
+        }
+    };
+
+    // Mostrar/ocultar advertencia con imagen
+    function toggleWarning(show) {
+        const detector = document.getElementById('adblock-detector');
+        const container = document.querySelector('.container');
+        
+        if (show) {
+            // Crear imagen de bloqueador si no existe
+            if (!document.getElementById('adblock-image')) {
+                const img = document.createElement('img');
+                img.id = 'adblock-image';
+                img.src = 'https://example.com/adblock-warning.png'; // Reemplaza con tu imagen
+                img.alt = 'Bloqueador de anuncios detectado';
+                img.style.maxWidth = '200px';
+                img.style.margin = '20px auto';
+                img.style.display = 'block';
+                detector.insertBefore(img, detector.querySelector('p'));
+            }
+            
+            detector.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            container.style.filter = 'blur(5px)';
+            container.style.pointerEvents = 'none';
+            
+            // Bloqueos avanzados
+            document.addEventListener('keydown', blockShortcuts);
+            document.addEventListener('contextmenu', blockContextMenu);
+            document.addEventListener('copy', blockCopy);
+        } else {
+            detector.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            container.style.filter = 'none';
+            container.style.pointerEvents = 'auto';
+            
+            // Restaurar eventos
+            document.removeEventListener('keydown', blockShortcuts);
+            document.removeEventListener('contextmenu', blockContextMenu);
+            document.removeEventListener('copy', blockCopy);
+        }
+    }
+
+    // Funciones de bloqueo mejoradas
+    function blockShortcuts(e) {
+        const blockedKeys = ['F12', 'F11', 'F5', 'F3', 'F7', 'u', 'U', 'i', 'I'];
+        if (e.ctrlKey || e.metaKey || blockedKeys.includes(e.key)) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+    }
+
+    function blockContextMenu(e) {
+        e.preventDefault();
+        return false;
+    }
+
+    function blockCopy(e) {
+        e.preventDefault();
+        return false;
+    }
+
+    // Cookie de bypass mejorada
+    function setBypassCookie() {
+        const date = new Date();
+        date.setTime(date.getTime() + (config.cookieDays * 24 * 60 * 60 * 1000));
+        const cookie = `${config.cookieName}=true; expires=${date.toUTCString()}; path=/; SameSite=Strict`;
+        document.cookie = cookie;
+        bypassEnabled = true;
+    }
+
+    // Verificación principal corregida
+    async function runDetection() {
+        if (bypassEnabled || permanentBlock) return;
+        
+        checkCount++;
+        if (checkCount > config.maxChecks) {
+            permanentBlock = true;
+        }
+        
+        // Ejecutar métodos de detección
+        const results = await Promise.all([
+            detectionMethods.checkAdScripts(),
+            detectionMethods.checkTestElements(),
+            detectionMethods.checkBlockedRequests(),
+            detectionMethods.checkVisibleAds(),
+            detectionMethods.checkAdAPI()
+        ]);
+        
+        // Lógica de decisión corregida
+        const detected = results.filter(Boolean).length >= 3;
+        
+        if (config.debug) {
+            console.log('[Anti-AdBlock] Resultados:', {
+                scripts: results[0],
+                elements: results[1],
+                requests: results[2],
+                visible: results[3],
+                api: results[4],
+                conclusion: detected ? 'ADBLOCK ACTIVO' : 'ADBLOCK INACTIVO'
             });
         }
         
-        // Mostrar advertencia si se detecta AdBlock
-        async function checkAdBlock() {
-            const isAdBlockActive = await detectAdBlock();
-            if (isAdBlockActive) {
-                document.getElementById('adblock-detector').style.display = 'flex';
-                document.body.style.overflow = 'hidden';
+        if (detected !== adBlockDetected) {
+            adBlockDetected = detected;
+            toggleWarning(detected);
+            
+            if (!detected && checkCount > 1) {
+                setBypassCookie();
             }
         }
+    }
+
+    // Inicialización mejorada
+    function init() {
+        if (bypassEnabled) {
+            if (config.debug) console.log('[Anti-AdBlock] Bypass activado por cookie');
+            return;
+        }
         
-        // Ejecutar la comprobación al cargar la página
-        window.addEventListener('load', checkAdBlock);
+        // Verificación inicial con retraso
+        setTimeout(runDetection, 2000);
         
-        // También comprobar periódicamente por si activan AdBlock después de cargar
-        setInterval(checkAdBlock, 5000);
-    </script>
+        // Verificación periódica
+        const checkInterval = setInterval(runDetection, config.checkInterval);
+        
+        // Eventos de visibilidad
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) runDetection();
+        });
+        
+        // Configurar botón de recarga
+        const reloadBtn = document.querySelector('#adblock-detector button');
+        if (reloadBtn) {
+            reloadBtn.addEventListener('click', () => {
+                setBypassCookie();
+                location.reload();
+            });
+        }
+    }
+
+    // Inicio seguro
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 </body>
 </html>
