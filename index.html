@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="google-adsense-account" content="ca-pub-3869365676003245">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juegos HTML - Colección de Juegos Clásicos</title>
@@ -219,6 +218,26 @@
             visibility: hidden;
         }
         
+        /* Estilos para los anuncios */
+        .ad-container {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .ad-container.horizontal {
+            width: 100%;
+        }
+        
+        .ad-container.vertical {
+            float: right;
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -235,14 +254,21 @@
             #adblock-detector h2 {
                 font-size: 1.5rem;
             }
+            
+            .ad-container.vertical {
+                float: none;
+                margin-left: 0;
+                margin: 1rem auto;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Elemento para detectar AdBlock -->
+    <!-- Elementos para detectar AdBlock mejorado -->
     <div class="test-ad" id="adBlockBait"> 
         <div class="ad" style="width: 1px; height: 1px; background: transparent;"></div>
     </div>
+    <div id="fakeAd" style="position: absolute; left: -9999px; top: -9999px;" class="adsbox ad-placement ad-unit"></div>
     
     <!-- Popup de detección de AdBlock -->
     <div id="adblock-detector">
@@ -257,6 +283,20 @@
             <h1>Mis Juegos HTML</h1>
             <p class="subtitle">Una colección de juegos clásicos creados con HTML, CSS y JavaScript. ¡Diviértete jugando!</p>
         </header>
+        
+        <!-- Primer anuncio horizontal -->
+        <div class="ad-container horizontal">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <!-- ads -->
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:550px;height:50px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="6790058992"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
         
         <div class="games-grid">
             <div class="game-card">
@@ -320,42 +360,101 @@
             </div>
         </div>
         
+        <!-- Segundo anuncio vertical -->
+        <div class="ad-container vertical">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:360px;height:150px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="8675622789"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
         <footer>
             <p>© 2023 Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
 
     <script>
-        // Detección de AdBlock
+        // Detección de AdBlock mejorada
         function detectAdBlock() {
             return new Promise((resolve) => {
+                // Método 1: Verificar elemento de prueba
                 const ad = document.getElementById('adBlockBait');
                 const testAd = ad.querySelector('.ad');
                 
-                // Comprobamos si el AdBlock ha ocultado el anuncio de prueba
+                // Método 2: Verificar solicitud bloqueada
+                const fakeAd = document.getElementById('fakeAd');
+                
+                // Método 3: Verificar si los scripts de ads fueron bloqueados
+                const isGoogleAdBlocked = typeof adsbygoogle === 'undefined';
+                
+                // Método 4: Intentar cargar un recurso de ad
+                const testAdUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+                fetch(testAdUrl, { method: 'HEAD', mode: 'no-cors' })
+                    .catch(() => {
+                        // Si falla, probablemente sea bloqueado
+                        resolve(true);
+                    });
+                
+                // Comprobar después de un breve retraso
                 setTimeout(() => {
-                    const isBlocked = testAd.offsetHeight === 0 || 
-                                     testAd.style.height === '0px' || 
-                                     window.getComputedStyle(testAd).display === 'none';
+                    const isBlocked = 
+                        testAd.offsetHeight === 0 || 
+                        testAd.style.height === '0px' || 
+                        window.getComputedStyle(testAd).display === 'none' ||
+                        fakeAd.offsetHeight === 0 ||
+                        window.getComputedStyle(fakeAd).display === 'none' ||
+                        isGoogleAdBlocked;
+                    
                     resolve(isBlocked);
-                }, 100);
+                }, 200);
             });
         }
         
         // Mostrar advertencia si se detecta AdBlock
         async function checkAdBlock() {
-            const isAdBlockActive = await detectAdBlock();
-            if (isAdBlockActive) {
+            try {
+                const isAdBlockActive = await detectAdBlock();
+                if (isAdBlockActive) {
+                    document.getElementById('adblock-detector').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Bloquear el acceso al contenido
+                    document.querySelector('.container').style.filter = 'blur(5px)';
+                    document.querySelector('.container').style.pointerEvents = 'none';
+                }
+            } catch (e) {
+                // Si hay un error en la detección, asumimos que hay AdBlock
                 document.getElementById('adblock-detector').style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             }
         }
         
         // Ejecutar la comprobación al cargar la página
-        window.addEventListener('load', checkAdBlock);
+        window.addEventListener('load', function() {
+            // Esperar un poco para que los adblocks actúen
+            setTimeout(checkAdBlock, 1000);
+        });
         
         // También comprobar periódicamente por si activan AdBlock después de cargar
-        setInterval(checkAdBlock, 5000);
+        setInterval(checkAdBlock, 10000);
+        
+        // Verificar si el usuario intenta engañar al sistema
+        document.addEventListener('DOMContentLoaded', function() {
+            const originalPush = adsbygoogle.push;
+            adsbygoogle.push = function() {
+                if (arguments.length === 0 || !arguments[0] || !arguments[0].dataAdClient) {
+                    // Intento de engaño detectado
+                    document.getElementById('adblock-detector').style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                }
+                return originalPush.apply(this, arguments);
+            };
+        });
     </script>
 </body>
 </html>
