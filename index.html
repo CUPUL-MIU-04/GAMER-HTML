@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta name="google-adsense-account" content="ca-pub-3869365676003245">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Juegos HTML - Colección de Juegos Clásicos</title>
     <meta name="description" content="Colección de juegos clásicos creados con HTML, CSS y JavaScript. Disfruta de juegos como Snake, Ahorcado, Adivina la Carta y más.">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -165,98 +165,49 @@
             opacity: 0.7;
         }
         
-        /* Estilos para el anti-adblock */
-        #adblock-detector {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+        /* Estilos para los anuncios */
+        .ad-container {
+            margin: 2rem 0;
+            display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            color: white;
-            text-align: center;
-            padding: 2rem;
+            min-height: 100px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 1rem;
+            position: relative;
         }
         
-        #adblock-detector h2 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-            font-size: 2rem;
+        .ad-backup-image {
+            display: none;
+            max-width: 100%;
+            height: auto;
         }
         
-        #adblock-detector p {
-            margin-bottom: 2rem;
-            max-width: 600px;
-        }
-        
-        #adblock-detector button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 50px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        #adblock-detector button:hover {
-            background-color: var(--accent-color);
-            transform: scale(1.05);
-        }
-        
-        .test-ad {
-            width: 1px;
-            height: 1px;
-            position: absolute;
-            left: -100px;
-            top: -100px;
-            visibility: hidden;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            h1 {
-                font-size: 1.8rem;
-            }
-            
-            .subtitle {
-                font-size: 1rem;
-            }
-            
-            #adblock-detector h2 {
-                font-size: 1.5rem;
-            }
-        }
+
     </style>
 </head>
 <body>
-    <!-- Elemento para detectar AdBlock -->
-    <div class="test-ad" id="adBlockBait"> 
-        <div class="ad" style="width: 1px; height: 1px; background: transparent;"></div>
-    </div>
     
-    <!-- Popup de detección de AdBlock -->
-    <div id="adblock-detector">
-        <h2>¡AdBlock Detectado!</h2>
-        <p>Hemos detectado que estás usando un bloqueador de anuncios. Este sitio se mantiene gracias a la publicidad. Por favor, desactiva tu AdBlock para continuar disfrutando de nuestros juegos.</p>
-        <p>Después de desactivarlo, recarga la página para continuar.</p>
-        <button onclick="location.reload()">Ya desactivé AdBlock</button>
-    </div>
-    
-    <div class="container">
+    <div class="container" id="main-content">
         <header>
             <h1>Mis Juegos HTML</h1>
             <p class="subtitle">Una colección de juegos clásicos creados con HTML, CSS y JavaScript. ¡Diviértete jugando!</p>
         </header>
+        
+        <!-- Anuncio 1 -->
+        <div class="ad-container">
+            <img src="https://i.imgur.com/5QzYz0M.jpg" alt="Publicidad - Apoya nuestro sitio" class="ad-backup-image">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:550px;height:50px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="6790058992"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
         
         <div class="games-grid">
             <div class="game-card">
@@ -320,42 +271,25 @@
             </div>
         </div>
         
+        <!-- Anuncio 2 -->
+        <div class="ad-container">
+            <img src="https://i.imgur.com/JqYeZnW.jpg" alt="Publicidad - Gracias por tu apoyo" class="ad-backup-image">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
+                 crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:360px;height:150px"
+                 data-ad-client="ca-pub-3869365676003245"
+                 data-ad-slot="8675622789"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        
         <footer>
-            <p>© 2023 Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
+            <p>© <span id="current-year"></span> Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
-
-    <script>
-        // Detección de AdBlock
-        function detectAdBlock() {
-            return new Promise((resolve) => {
-                const ad = document.getElementById('adBlockBait');
-                const testAd = ad.querySelector('.ad');
-                
-                // Comprobamos si el AdBlock ha ocultado el anuncio de prueba
-                setTimeout(() => {
-                    const isBlocked = testAd.offsetHeight === 0 || 
-                                     testAd.style.height === '0px' || 
-                                     window.getComputedStyle(testAd).display === 'none';
-                    resolve(isBlocked);
-                }, 100);
-            });
-        }
-        
-        // Mostrar advertencia si se detecta AdBlock
-        async function checkAdBlock() {
-            const isAdBlockActive = await detectAdBlock();
-            if (isAdBlockActive) {
-                document.getElementById('adblock-detector').style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            }
-        }
-        
-        // Ejecutar la comprobación al cargar la página
-        window.addEventListener('load', checkAdBlock);
-        
-        // También comprobar periódicamente por si activan AdBlock después de cargar
-        setInterval(checkAdBlock, 5000);
     </script>
 </body>
 </html>
