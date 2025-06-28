@@ -185,10 +185,204 @@
             height: auto;
         }
         
-
+        /* Estilos para el bloque de donaciones */
+        .donation-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        
+        .donation-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        
+        .donation-text {
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+        }
+        
+        .donation-options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .donation-option {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .donation-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .donation-option.selected {
+            border-color: var(--primary-color);
+            background-color: #f0f5ff;
+        }
+        
+        .donation-amount {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+        
+        /* Estilos para el anti-adblock */
+        #adblock-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        #adblock-alert {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #adblock-alert h2 {
+            color: var(--error-color);
+            margin-bottom: 1rem;
+        }
+        
+        #adblock-alert p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        #reload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #reload-btn:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .blur-content {
+            filter: blur(5px);
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        /* Estilos para el modal de donaciones */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1001;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--dark-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ad-container ins {
+                width: 100% !important;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Overlay de adblock -->
+    <div id="adblock-overlay">
+        <div id="adblock-alert">
+            <h2>¡Bloqueador de Anuncios Detectado!</h2>
+            <img src="https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Anti-Adblock/Anti-Adblock.png" 
+                 alt="AdBlock Detectado" 
+                 style="max-width: 100%; height: auto; margin: 1rem 0;">
+            <p>Este sitio se mantiene gracias a la publicidad. Por favor, desactiva tu bloqueador de anuncios para continuar disfrutando de nuestros juegos.</p>
+            <p>Tu apoyo nos ayuda a seguir creando contenido gratuito y de calidad.</p>
+            <button id="reload-btn">Ya desactivé el bloqueador</button>
+        </div>
+    </div>
+    
+    <!-- Modal de donaciones -->
+    <div id="donation-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Selecciona tu método de donación</h2>
+            <div id="paypal-button-container"></div>
+            <p style="margin: 1rem 0;">Otras formas de donar:</p>
+            <div style="display: flex; justify-content: center; gap: 1rem;">
+                <button onclick="copyCryptoAddress('BTC')" style="padding: 0.5rem; background: #f7931a; color: white; border: none; border-radius: 4px;">BTC</button>
+                <button onclick="copyCryptoAddress('ETH')" style="padding: 0.5rem; background: #627eea; color: white; border: none; border-radius: 4px;">ETH</button>
+                <button onclick="copyCryptoAddress('USDT')" style="padding: 0.5rem; background: #26a17b; color: white; border: none; border-radius: 4px;">USDT</button>
+            </div>
+            <div id="crypto-address" style="margin-top: 1rem; display: none;">
+                <p>Dirección copiada al portapapeles:</p>
+                <code id="address-display" style="word-break: break-all; background: #f5f5f5; padding: 0.5rem; border-radius: 4px;"></code>
+            </div>
+        </div>
+    </div>
     
     <div class="container" id="main-content">
         <header>
@@ -198,7 +392,6 @@
         
         <!-- Anuncio 1 -->
         <div class="ad-container">
-            <img src="https://i.imgur.com/5QzYz0M.jpg" alt="Publicidad - Apoya nuestro sitio" class="ad-backup-image">
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
                  crossorigin="anonymous"></script>
             <ins class="adsbygoogle"
@@ -274,7 +467,6 @@
         
         <!-- Anuncio 2 -->
         <div class="ad-container">
-            <img src="https://i.imgur.com/JqYeZnW.jpg" alt="Publicidad - Gracias por tu apoyo" class="ad-backup-image">
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3869365676003245"
                  crossorigin="anonymous"></script>
             <ins class="adsbygoogle"
@@ -286,11 +478,225 @@
             </script>
         </div>
         
+        <!-- Sección de Donaciones Mejorada -->
+        <div class="donation-section">
+            <h2 class="donation-title">¡Apoya este proyecto!</h2>
+            <p class="donation-text">Si disfrutas de estos juegos, considera hacer una donación para ayudar a mantener y mejorar este sitio.</p>
+            
+            <div class="donation-options">
+                <div class="donation-option" onclick="openDonationModal(5)">
+                    <div class="donation-amount">$5 USD</div>
+                    <small>Apoyo básico</small>
+                </div>
+                <div class="donation-option" onclick="openDonationModal(10)">
+                    <div class="donation-amount">$10 USD</div>
+                    <small>Apoyo estándar</small>
+                </div>
+                <div class="donation-option" onclick="openDonationModal(20)">
+                    <div class="donation-amount">$20 USD</div>
+                    <small>Gran apoyo</small>
+                </div>
+                <div class="donation-option" onclick="openDonationModal(0)">
+                    <div class="donation-amount">Otro monto</div>
+                    <small>Personalizado</small>
+                </div>
+            </div>
+            
+            <button onclick="openDonationModal(0)" style="margin-top: 1.5rem; background-color: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 50px; font-weight: 600; cursor: pointer;">
+                Donar ahora
+            </button>
+        </div>
         
         <footer>
             <p>© <span id="current-year"></span> Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
+
+    <!-- PayPal SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=TU_CLIENT_ID_PAYPAL&currency=USD"></script>
+    
+    <!-- Scripts mejorados -->
+    <script>
+        // ===== CONFIGURACIÓN INICIAL =====
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // ===== ANTI-ADBLOCK MEJORADO =====
+        async function detectAdBlock() {
+            // Múltiples métodos de detección para mayor precisión
+            const detectionMethods = [
+                // Método 1: Intento de carga de script de ads
+                () => new Promise(resolve => {
+                    const script = document.createElement('script');
+                    script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+                    script.onerror = () => resolve(true);
+                    script.onload = () => resolve(false);
+                    document.head.appendChild(script);
+                    setTimeout(() => document.head.removeChild(script), 200);
+                }),
+                
+                // Método 2: Elemento con clase de anuncio
+                () => new Promise(resolve => {
+                    const testAd = document.createElement('div');
+                    testAd.innerHTML = '&nbsp;';
+                    testAd.className = 'adsbox pub_300x250 pub_300x250m pub_728x90 text-ad textAd text_ad text_ads text-ads';
+                    testAd.style.position = 'absolute';
+                    testAd.style.left = '-9999px';
+                    document.body.appendChild(testAd);
+                    
+                    setTimeout(() => {
+                        const isBlocked = testAd.offsetHeight === 0 || 
+                                        window.getComputedStyle(testAd).display === 'none';
+                        document.body.removeChild(testAd);
+                        resolve(isBlocked);
+                    }, 100);
+                }),
+                
+                // Método 3: Intento de fetch a dominio de anuncios
+                () => new Promise(resolve => {
+                    fetch('https://www.google-analytics.com/analytics.js', {
+                        method: 'HEAD',
+                        mode: 'no-cors'
+                    }).then(() => resolve(false)).catch(() => resolve(true));
+                })
+            ];
+            
+            // Ejecutar todos los métodos en paralelo
+            const results = await Promise.all(detectionMethods.map(fn => fn()));
+            
+            // Si al menos 2 métodos detectan adblock, consideramos que está activo
+            return results.filter(Boolean).length >= 2;
+        }
+        
+        async function handleAdBlockDetection() {
+            const isAdBlockActive = await detectAdBlock();
+            
+            if(isAdBlockActive) {
+                // Mostrar overlay de adblock
+                document.getElementById('adblock-overlay').style.display = 'flex';
+                document.getElementById('main-content').classList.add('blur-content');
+                
+                // Mostrar imágenes de respaldo para anuncios
+                document.querySelectorAll('.ad-backup-image').forEach(img => {
+                    img.style.display = 'block';
+                });
+                
+                // Intentar detectar nuevamente después de 30 segundos
+                setTimeout(handleAdBlockDetection, 30000);
+            } else {
+                document.getElementById('adblock-overlay').style.display = 'none';
+                document.getElementById('main-content').classList.remove('blur-content');
+            }
+        }
+        
+        // Botón de recargar
+        document.getElementById('reload-btn').addEventListener('click', () => {
+            window.location.reload();
+        });
+        
+        // Verificar al cargar la página
+        window.addEventListener('load', handleAdBlockDetection);
+        
+        // ===== SISTEMA DE DONACIONES MEJORADO =====
+        let selectedDonationAmount = 0;
+        
+        function openDonationModal(amount) {
+            selectedDonationAmount = amount;
+            document.getElementById('donation-modal').style.display = 'flex';
+            
+            // Configurar botones de PayPal según el monto seleccionado
+            if(window.paypal) {
+                renderPayPalButtons(amount);
+            }
+        }
+        
+        // Cerrar modal
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            document.getElementById('donation-modal').style.display = 'none';
+        });
+        
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', (event) => {
+            if(event.target === document.getElementById('donation-modal')) {
+                document.getElementById('donation-modal').style.display = 'none';
+            }
+        });
+        
+        // Renderizar botones de PayPal
+        function renderPayPalButtons(amount) {
+            paypal.Buttons({
+                style: {
+                    shape: 'pill',
+                    color: 'blue',
+                    layout: 'vertical',
+                    label: 'donate'
+                },
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: amount > 0 ? amount.toString() : '0.00',
+                                breakdown: {
+                                    item_total: {
+                                        value: amount > 0 ? amount.toString() : '0.00',
+                                        currency_code: 'USD'
+                                    }
+                                }
+                            },
+                            items: [{
+                                name: 'Donación para Mis Juegos HTML',
+                                description: 'Donación voluntaria para apoyar el desarrollo',
+                                quantity: '1',
+                                unit_amount: {
+                                    value: amount > 0 ? amount.toString() : '0.00',
+                                    currency_code: 'USD'
+                                }
+                            }]
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert(`¡Gracias por tu donación de $${details.purchase_units[0].amount.value} USD, ${details.payer.name.given_name}!`);
+                        document.getElementById('donation-modal').style.display = 'none';
+                    });
+                },
+                onError: function(err) {
+                    console.error('Error en PayPal:', err);
+                    alert('Ocurrió un error al procesar tu donación. Por favor intenta nuevamente.');
+                }
+            }).render('#paypal-button-container');
+        }
+        
+        // Copiar dirección de cripto
+        function copyCryptoAddress(type) {
+            const addresses = {
+                'BTC': 'bc1qejksdflkjsdflkjsdflkjsdflkjsdflkj',
+                'ETH': '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12',
+                'USDT': '0xAbCdEf1234567890AbCdEf1234567890AbCdEf12'
+            };
+            
+            navigator.clipboard.writeText(addresses[type]).then(() => {
+                const display = document.getElementById('address-display');
+                display.textContent = addresses[type];
+                document.getElementById('crypto-address').style.display = 'block';
+                
+                setTimeout(() => {
+                    document.getElementById('crypto-address').style.display = 'none';
+                }, 5000);
+            });
+        }
+        
+        // Cargar PayPal SDK si no está bloqueado
+        if(!window.paypal) {
+            const script = document.createElement('script');
+            script.src = 'https://www.paypal.com/sdk/js?client-id=TU_CLIENT_ID_PAYPAL&currency=USD';
+            script.onload = () => {
+                if(selectedDonationAmount > 0) {
+                    renderPayPalButtons(selectedDonationAmount);
+                }
+            };
+            document.head.appendChild(script);
+        }
     </script>
 </body>
 </html>
