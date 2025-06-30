@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juegos HTML - Donaciones</title>
-    <meta name="description" content="Apoya el desarrollo de juegos HTML con tu donación">
+    <title>Juegos HTML - Colección de Juegos Clásicos</title>
+    <meta name="description" content="Colección de juegos clásicos creados con HTML, CSS y JavaScript. Disfruta de juegos como Snake, Ahorcado, Adivina la Carta y más.">
+    <meta name="theme-color" content="#6c5ce7">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -17,83 +18,277 @@
             --dark-color: #2d3436;
             --light-color: #f5f6fa;
             --success-color: #00b894;
+            --error-color: #d63031;
             --paypal-color: #0070ba;
             --paypal-hover: #005b95;
             --mp-color: #00a1e1;
             --mp-hover: #0085c3;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+        
         
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: var(--dark-color);
             min-height: 100vh;
-            margin: 0;
-            padding: 2rem;
             line-height: 1.6;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
+            position: relative;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
         }
         
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+            line-height: 1.3;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .subtitle {
+            color: var(--dark-color);
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            position: relative;
+            animation: cardEntrance 0.6s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+        
+        .game-image-container {
+            height: 180px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-image {
+            max-height: 80%;
+            max-width: 80%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            z-index: 1;
+        }
+        
+        .game-card:hover .game-image {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .game-info {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .game-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .game-desc {
+            color: var(--dark-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        .game-card:hover .play-btn {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(253, 121, 168, 0.4);
+        }
+        
+        /* Sección de Donaciones */
         .donation-section {
-            margin: 3rem 0;
-            padding: 2rem;
+            margin: 5rem 0 3rem;
+            padding: 3rem 2rem;
             background: linear-gradient(135deg, rgba(108, 92, 231, 0.05) 0%, rgba(162, 155, 254, 0.05) 100%);
             border-radius: 15px;
             border: 1px solid rgba(108, 92, 231, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .donation-section::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--primary-light) 0%, rgba(162, 155, 254, 0) 70%);
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .donation-section::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--accent-color) 0%, rgba(253, 121, 168, 0) 70%);
+            opacity: 0.2;
+            z-index: 0;
         }
         
         .donation-title {
             text-align: center;
+            font-family: 'Press Start 2P', cursive;
             color: var(--primary-color);
             margin-bottom: 1.5rem;
-            font-size: 1.8rem;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            position: relative;
+            z-index: 1;
         }
         
         .donation-subtitle {
             text-align: center;
             max-width: 700px;
-            margin: 0 auto 2rem;
+            margin: 0 auto 2.5rem;
+            color: var(--dark-color);
+            position: relative;
+            z-index: 1;
+            font-size: 1.1rem;
         }
         
         .donation-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
             margin-top: 2rem;
+            position: relative;
+            z-index: 1;
         }
         
         .donation-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 12px;
             padding: 2rem;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
             transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .donation-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
         }
         
         .payment-logo {
-            height: 60px;
+            height: 70px;
+            width: auto;
             margin: 0 auto 1.5rem;
             display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .donation-card:hover .payment-logo {
+            transform: scale(1.05);
         }
         
         .donation-card-title {
+            font-size: 1.3rem;
             text-align: center;
             margin-bottom: 1.5rem;
-            font-size: 1.3rem;
+            color: var(--dark-color);
+            font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -112,173 +307,249 @@
             border: none;
             border-radius: 8px;
             padding: 0.8rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .amount-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(162, 155, 254, 0.1) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .amount-btn:hover {
+            background: #dfe6e9;
+        }
+        
+        .amount-btn:hover::after {
+            opacity: 1;
         }
         
         .amount-btn.selected {
             background: var(--primary-color);
             color: white;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
         }
         
         .custom-amount {
             margin: 1.5rem 0;
         }
         
+        .custom-amount label {
+            display: block;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.95rem;
+        }
+        
         .amount-input {
             width: 90%;
             padding: 0.9rem 1rem;
             border: 2px solid var(--light-color);
-            border-radius: 15px;
+            border-radius: 100px;
             font-size: 1rem;
+            transition: var(--transition);
+            font-weight: 500;
         }
         
         .amount-input:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        
+        .examples {
+            font-size: 0.85rem;
+            color: #636e72;
+            margin-top: 0.7rem;
+            font-style: italic;
         }
         
         .donate-btn {
             width: 100%;
             padding: 1rem;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
+            margin-top: auto;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.7rem;
-            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .donate-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+            transition: var(--transition);
+        }
+        
+        .donate-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .donate-btn:hover::after {
+            transform: translateX(100%);
         }
         
         .paypal-btn {
             background: var(--paypal-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 112, 186, 0.3);
         }
         
         .paypal-btn:hover {
             background: var(--paypal-hover);
-        }
-        
-        .mp-btn {
-            background: var(--mp-color);
-        }
-        
-        .mp-btn:hover {
-            background: var(--mp-hover);
+            box-shadow: 0 6px 20px rgba(0, 91, 149, 0.4);
         }
         
         .security-note {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 2.5rem;
+            color: #636e72;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.7rem;
+            position: relative;
+            z-index: 1;
         }
         
         footer {
             text-align: center;
-            margin-top: 3rem;
+            margin-top: 4rem;
             padding-top: 2rem;
             border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--dark-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
         }
         
+        /* Efectos de carga */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
             .container {
                 padding: 1.5rem;
+                margin: 1rem;
             }
             
             .donation-section {
+                padding: 2rem 1.5rem;
+                margin: 3rem 0;
+            }
+            
+            .donation-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .donation-card {
                 padding: 1.5rem;
             }
             
             .amount-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .amount-options {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .game-card {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 <body>
+    
+    <div class="container">
+        <header>
 
 <!-- Sección de Donaciones -->
 <section class="donation-section">
     <h2 class="donation-title">APOYA EL PROYECTO</h2>
     <p class="donation-subtitle">¡Tu donación me ayuda mucho! Con tu apoyo podré seguir desarrollando más juegos HTML que podrás disfrutar directamente en tu navegador de Google.</p>
+    
+    <div class="donation-grid">
+        <!-- Tarjeta de PayPal -->
+        <div class="donation-card">
+            <img src="https://www.top-bank.ch/images/logo_540/paypal.png" alt="PayPal" class="payment-logo">
+            <h3 class="donation-card-title"><i class="fab fa-paypal"></i> Donar con PayPal</h3>
             
-            <div class="donation-grid">
-                <!-- Tarjeta de PayPal -->
-                <div class="donation-card">
-                    <img src="https://www.top-bank.ch/images/logo_540/paypal.png" alt="PayPal" class="payment-logo">
-                    <h3 class="donation-card-title"><i class="fab fa-paypal"></i> Donar con PayPal</h3>
-                    
-                    <div class="amount-options" id="paypal-amounts">
-                        <button class="amount-btn" data-amount="5">$5</button>
-                        <button class="amount-btn" data-amount="10">$10</button>
-                        <button class="amount-btn" data-amount="20">$20</button>
-                    </div>
-                    
-                    <div class="custom-amount">
-                        <label for="paypal-custom-amount">O especifica tu monto:</label>
-                        <input type="number" id="paypal-custom-amount" class="amount-input" min="1" value="10" placeholder="Ej: 50">
-                    </div>
-                    
-                    <form action="https://www.paypal.com/donate" method="post" target="_blank">
-                        <input type="hidden" name="business" value="TU_EMAIL_DE_PAYPAL">
-                        <input type="hidden" name="currency_code" value="USD">
-                        <input type="hidden" name="amount" id="paypal-amount" value="10">
-                        <input type="hidden" name="item_name" value="Donación para Juegos HTML">
-                        <button type="submit" class="donate-btn paypal-btn">
-                            <i class="fab fa-paypal"></i> Donar con PayPal
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Tarjeta de Mercado Pago -->
-                <div class="donation-card">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlq1d5Bbh4pR1CVLx2eOq8MS5AKCJ4N_Xvqhl6f_ub4T8t-QaPk0aduaY&s=10" alt="Mercado Pago" class="payment-logo">
-                    <h3 class="donation-card-title"><i class="fas fa-wallet"></i> Donar con Mercado Pago</h3>
-                    
-                    <div class="amount-options" id="mp-amounts">
-                        <button class="amount-btn" data-amount="5">$5</button>
-                        <button class="amount-btn" data-amount="10">$10</button>
-                        <button class="amount-btn" data-amount="20">$20</button>
-                    </div>
-                    
-                    <div class="custom-amount">
-                        <label for="mp-custom-amount">O especifica tu monto:</label>
-                        <input type="number" id="mp-custom-amount" class="amount-input" min="1" value="10" placeholder="Ej: 50">
-                    </div>
-                    
-                    <button id="mp-donate-btn" class="donate-btn mp-btn">
-                        <i class="fas fa-hand-holding-usd"></i> Donar con Mercado Pago
-                    </button>
-                </div>
+            <div class="amount-options" id="paypal-amounts">
+                <button class="amount-btn" data-amount="5">$5</button>
+                <button class="amount-btn" data-amount="10">$10</button>
+                <button class="amount-btn" data-amount="20">$20</button>
             </div>
             
-            <p class="security-note">
-                <i class="fas fa-lock" style="color: var(--success-color);"></i>
-                Todas las transacciones son seguras y encriptadas
-            </p>
-        </section>
+            <div class="custom-amount">
+                <label for="paypal-custom-amount"><i class="fas fa-edit"></i> O especifica tu monto:</label>
+                <input type="number" id="paypal-custom-amount" class="amount-input" min="1" value="10" step="1" placeholder="Ej: 50">
+                <p class="examples">Ejemplos: $50, $100, $500 o cualquier otro monto</p>
+            </div>
+            
+            <form action="https://www.paypal.com/donate" method="post" target="_blank" id="paypal-form">
+                <input type="hidden" name="business" value="Cupul_Miu_04@outlook.com">
+                <input type="hidden" name="currency_code" value="USD">
+                <input type="hidden" name="amount" id="paypal-amount" value="10">
+                <input type="hidden" name="item_name" value="Donación para Mis Juegos HTML">
+                <button type="submit" class="donate-btn paypal-btn">
+                    <i class="fab fa-paypal"></i> Donar con PayPal
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <p class="security-note">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="var(--success-color)">
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+        </svg>
+        Todas las transacciones son seguras y encriptadas
+    </p>
+</section>
         
         <footer>
-            <p>© <span id="current-year">2023</span> Juegos HTML | Creado con ❤️</p>
+            <p>© <span id="current-year">2023</span> Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
 
-    <!-- SDK Mercado Pago -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Actualizar año
+            // Actualizar año actual
             document.getElementById('current-year').textContent = new Date().getFullYear();
             
-            // Configurar métodos de pago
+            // Configuración para PayPal
             const setupPaymentMethod = (amountsId, inputId, hiddenInputId) => {
                 const amountButtons = document.querySelectorAll(`#${amountsId} .amount-btn`);
                 const customInput = document.getElementById(inputId);
@@ -287,7 +558,6 @@
                 // Seleccionar primer botón por defecto
                 if (amountButtons.length > 0) {
                     amountButtons[0].classList.add('selected');
-                    if (hiddenInput) hiddenInput.value = amountButtons[0].getAttribute('data-amount');
                 }
 
                 amountButtons.forEach(button => {
@@ -295,60 +565,36 @@
                         e.preventDefault();
                         const amount = button.getAttribute('data-amount');
                         
+                        // Remover selección previa
                         amountButtons.forEach(btn => btn.classList.remove('selected'));
+                        
+                        // Seleccionar actual
                         button.classList.add('selected');
                         
+                        // Actualizar valores
                         customInput.value = amount;
-                        if (hiddenInput) hiddenInput.value = amount;
+                        hiddenInput.value = amount;
                     });
                 });
 
                 customInput.addEventListener('input', () => {
                     const amount = customInput.value;
                     
+                    // Si hay un monto válido, deseleccionar botones
                     if (amount && amount > 0) {
                         amountButtons.forEach(btn => btn.classList.remove('selected'));
-                        if (hiddenInput) hiddenInput.value = amount;
+                        hiddenInput.value = amount;
                     }
                 });
             };
 
             // Configurar PayPal
             setupPaymentMethod('paypal-amounts', 'paypal-custom-amount', 'paypal-amount');
-            
-            // Configurar Mercado Pago
-            setupPaymentMethod('mp-amounts', 'mp-custom-amount');
-            
-            // Inicializar Mercado Pago
-            const mp = new MercadoPago('TU_MP_PUBLIC_KEY', {
-                locale: 'es-MX'
-            });
-            
-            // Manejar Mercado Pago
-            document.getElementById('mp-donate-btn').addEventListener('click', async function() {
-                const amount = document.getElementById('mp-custom-amount').value;
-                
-                if (!amount || amount <= 0) {
-                    alert('Por favor ingresa un monto válido');
-                    return;
-                }
-                
-                try {
-                    // En una implementación real, esto llamaría a tu backend
-                    alert(`En producción esto redirigiría a Mercado Pago para donar $${amount}`);
-                    
-                    // Ejemplo de cómo sería con backend:
-                    // const response = await fetch('/crear-pago', {
-                    //     method: 'POST',
-                    //     headers: { 'Content-Type': 'application/json' },
-                    //     body: JSON.stringify({ amount })
-                    // });
-                    // const { init_point } = await response.json();
-                    // window.location.href = init_point;
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Ocurrió un error al procesar tu donación');
-                }
+
+            // Efecto de carga para las tarjetas de juego
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
             });
         });
     </script>
