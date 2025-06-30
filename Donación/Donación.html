@@ -26,6 +26,7 @@
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
         
+        
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -81,6 +82,112 @@
             max-width: 700px;
             margin: 0 auto;
             opacity: 0.9;
+        }
+        
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+            position: relative;
+            animation: cardEntrance 0.6s ease-out;
+            animation-fill-mode: backwards;
+        }
+        
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .game-card:nth-child(1) { animation-delay: 0.1s; }
+        .game-card:nth-child(2) { animation-delay: 0.2s; }
+        .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .game-card a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            height: 100%;
+        }
+        
+        .game-image-container {
+            height: 180px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-color) 100%);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .game-image {
+            max-height: 80%;
+            max-width: 80%;
+            object-fit: contain;
+            transition: transform 0.5s ease;
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2));
+            z-index: 1;
+        }
+        
+        .game-card:hover .game-image {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .game-info {
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .game-title {
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: var(--primary-color);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .game-desc {
+            color: var(--dark-color);
+            opacity: 0.8;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+        
+        .play-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        .game-card:hover .play-btn {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(253, 121, 168, 0.4);
         }
         
         /* Sección de Donaciones */
@@ -329,14 +436,6 @@
             box-shadow: 0 6px 20px rgba(0, 133, 195, 0.4);
         }
         
-        .payment-button-container {
-            margin-top: 1.5rem;
-            min-height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
         .security-note {
             text-align: center;
             margin-top: 2.5rem;
@@ -358,6 +457,12 @@
             color: var(--dark-color);
             opacity: 0.8;
             font-size: 0.95rem;
+        }
+        
+        /* Efectos de carga */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         /* Responsive */
@@ -390,6 +495,10 @@
             .amount-options {
                 grid-template-columns: repeat(2, 1fr);
             }
+            
+            .game-card {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -397,9 +506,6 @@
     
     <div class="container">
         <header>
-            <h1>Juegos HTML</h1>
-            <p class="subtitle">Colección de juegos clásicos creados con HTML, CSS y JavaScript. ¡Diviértete jugando!</p>
-        </header>
 
         <!-- Sección de Donaciones -->
         <section class="donation-section">
@@ -424,7 +530,15 @@
                         <p class="examples">Ejemplos: $50, $100, $500 o cualquier otro monto</p>
                     </div>
                     
-                    <div id="paypal-button-container" class="payment-button-container"></div>
+                    <form action="https://www.paypal.com/donate" method="post" target="_blank" id="paypal-form">
+                        <input type="hidden" name="business" value="PAYPAL_CLIENT_ID">
+                        <input type="hidden" name="currency_code" value="USD">
+                        <input type="hidden" name="amount" id="paypal-amount" value="10">
+                        <input type="hidden" name="item_name" value="Donación para Mis Juegos HTML">
+                        <button type="submit" class="donate-btn paypal-btn">
+                            <i class="fab fa-paypal"></i> Donar con PayPal
+                        </button>
+                    </form>
                 </div>
                 
                 <!-- Tarjeta de Mercado Pago -->
@@ -444,10 +558,9 @@
                         <p class="examples">Ejemplos: $50, $100, $500 o cualquier otro monto</p>
                     </div>
                     
-                    <button id="mp-donate-btn" class="donate-btn mp-btn">
+                    <a href="#" id="mp-donate-link" target="_blank" class="donate-btn mp-btn">
                         <i class="fas fa-hand-holding-usd"></i> Donar con Mercado Pago
-                    </button>
-                    <div id="mercadopago-button" class="payment-button-container" style="display: none;"></div>
+                    </a>
                 </div>
             </div>
             
@@ -464,21 +577,16 @@
         </footer>
     </div>
 
-    <!-- SDK de PayPal -->
-    <script src="https://www.paypal.com/sdk/js?client-id=TU_CLIENT_ID&currency=USD"></script>
-    
-    <!-- SDK de Mercado Pago -->
-    <script src="https://sdk.mercadopago.com/js/v2"></script>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Actualizar año actual
             document.getElementById('current-year').textContent = new Date().getFullYear();
             
             // Configuración para ambos métodos de pago
-            const setupPaymentMethod = (amountsId, inputId) => {
+            const setupPaymentMethod = (amountsId, inputId, hiddenInputId) => {
                 const amountButtons = document.querySelectorAll(`#${amountsId} .amount-btn`);
                 const customInput = document.getElementById(inputId);
+                const hiddenInput = document.getElementById(hiddenInputId);
 
                 // Seleccionar primer botón por defecto
                 if (amountButtons.length > 0) {
@@ -498,6 +606,7 @@
                         
                         // Actualizar valores
                         customInput.value = amount;
+                        hiddenInput.value = amount;
                     });
                 });
 
@@ -507,117 +616,38 @@
                     // Si hay un monto válido, deseleccionar botones
                     if (amount && amount > 0) {
                         amountButtons.forEach(btn => btn.classList.remove('selected'));
+                        hiddenInput.value = amount;
                     }
                 });
             };
 
             // Configurar PayPal
-            setupPaymentMethod('paypal-amounts', 'paypal-custom-amount');
+            setupPaymentMethod('paypal-amounts', 'paypal-custom-amount', 'paypal-amount');
             
             // Configurar Mercado Pago
-            setupPaymentMethod('mp-amounts', 'mp-custom-amount');
+            setupPaymentMethod('mp-amounts', 'mp-custom-amount', 'mp-amount');
 
-            // Inicializar PayPal
-            paypal.Buttons({
-                style: {
-                    layout: 'vertical',
-                    color: 'blue',
-                    shape: 'pill',
-                    label: 'donate'
-                },
-                createOrder: function(data, actions) {
-                    const amount = document.getElementById('paypal-custom-amount').value || '10';
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: amount,
-                                breakdown: {
-                                    item_total: {
-                                        value: amount,
-                                        currency_code: 'USD'
-                                    }
-                                }
-                            },
-                            items: [{
-                                name: "Donación para Mis Juegos HTML",
-                                unit_amount: {
-                                    value: amount,
-                                    currency_code: 'USD'
-                                },
-                                quantity: "1",
-                                category: "DONATION"
-                            }],
-                            payee: {
-                                email_address: "donaciones@tudominio.com" // Usa un correo genérico
-                            }
-                        }],
-                        application_context: {
-                            brand_name: "Juegos HTML de Don Luis", // Muestra solo "Don Luis"
-                            user_action: "DONATE"
-                        }
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        alert('¡Gracias por tu donación, ' + details.payer.name.given_name + '! Tu apoyo ayuda a mantener este proyecto.');
-                    });
-                },
-                onError: function(err) {
-                    console.error('Error en PayPal:', err);
-                    alert('Ocurrió un error al procesar tu donación. Por favor intenta nuevamente.');
-                }
-            }).render('#paypal-button-container');
-
-            // Configurar Mercado Pago
-            document.getElementById('mp-donate-btn').addEventListener('click', function(e) {
-                e.preventDefault();
-                const amount = document.getElementById('mp-custom-amount').value || '10';
-                
-                // Validar monto
-                if (isNaN(amount) {
+            // Manejar click en Mercado Pago
+            document.getElementById('mp-donate-link').addEventListener('click', function(e) {
+                const amount = document.getElementById('mp-custom-amount').value;
+                if (!amount || amount <= 0) {
+                    e.preventDefault();
                     alert('Por favor ingresa un monto válido');
                     return;
                 }
                 
-                // Ocultar botón y mostrar contenedor de Mercado Pago
-                this.style.display = 'none';
-                document.getElementById('mercadopago-button').style.display = 'block';
+                // Aquí deberías construir tu URL de Mercado Pago con el monto
+                // Ejemplo: this.href = `TU_LINK_BASE_DE_MERCADO_PAGO?amount=${amount}`;
                 
-                // Inicializar Mercado Pago
-                const mp = new MercadoPago('TU_PUBLIC_KEY', {
-                    locale: 'es-MX'
-                });
-                
-                // Crear preferencia (en producción esto debería hacerse desde tu backend)
-                const preference = {
-                    items: [{
-                        title: "Donación para Juegos HTML",
-                        quantity: 1,
-                        unit_price: parseFloat(amount),
-                        currency_id: "USD"
-                    }],
-                    payer: {
-                        name: "Don Luis", // Solo muestra "Don Luis"
-                    },
-                    external_reference: "donacion_juegos_html",
-                    back_urls: {
-                        success: window.location.href,
-                        failure: window.location.href,
-                        pending: window.location.href
-                    },
-                    auto_return: "approved",
-                    statement_descriptor: "JUEGOS HTML"
-                };
-                
-                // En producción, deberías hacer una llamada a tu backend para crear la preferencia
-                mp.checkout({
-                    preference: preference,
-                    render: {
-                        container: '#mercadopago-button',
-                        label: 'Donar',
-                        type: 'wallet'
-                    }
-                });
+                // Por ahora solo muestra una alerta
+                alert(`Redirigiendo a Mercado Pago para donar $${amount}. En implementación real, esto abriría el link de pago.`);
+                e.preventDefault();
+            });
+
+            // Efecto de carga para las tarjetas de juego
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
             });
         });
     </script>
