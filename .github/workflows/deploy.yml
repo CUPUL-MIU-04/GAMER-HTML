@@ -12,9 +12,8 @@ jobs:
     
     - name: Replace secrets in HTML
       run: |
-        sed -i "s|TU_CLIENT_ID|${{ secrets.PAYPAL_CLIENT_ID }}|g" index.html
-        sed -i "s|TU_PUBLIC_KEY|${{ secrets.MP_PUBLIC_KEY }}|g" index.html
-        sed -i "s|TU_ACCESS_TOKEN|${{ secrets.MP_ACCESS_TOKEN }}|g" index.html
+        sed -i "s/TU_EMAIL_DE_PAYPAL/${{ secrets.PAYPAL_EMAIL }}/g" Donación/Donación.html
+        sed -i "s/TU_MP_PUBLIC_KEY/${{ secrets.MP_PUBLIC_KEY }}/g" Donación/Donación.html
         
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
