@@ -18,6 +18,7 @@
             --light-color: #f5f6fa;
             --success-color: #00b894;
             --error-color: #d63031;
+            --neon-color: #00f3ff;
         }
         
         * {
@@ -28,20 +29,26 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: var(--dark-color);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--light-color);
             min-height: 100vh;
-            padding: 2rem;
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             position: relative;
         }
         
@@ -49,28 +56,40 @@
             text-align: center;
             margin-bottom: 3rem;
             position: relative;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
         }
         
         h1 {
             font-family: 'Press Start 2P', cursive;
-            color: var(--primary-color);
+            color: var(--neon-color);
             margin-bottom: 1rem;
             font-size: 2.5rem;
-            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
-            animation: pulse 2s infinite;
+            text-shadow: 0 0 10px var(--neon-color), 0 0 20px var(--neon-color);
+            animation: neonGlow 1.5s ease-in-out infinite alternate;
+            position: relative;
+            padding: 1rem;
         }
         
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        @keyframes neonGlow {
+            from {
+                text-shadow: 0 0 5px var(--neon-color), 0 0 10px var(--neon-color);
+            }
+            to {
+                text-shadow: 0 0 10px var(--neon-color), 0 0 20px var(--neon-color), 0 0 30px var(--neon-color);
+            }
         }
         
         .subtitle {
-            color: var(--dark-color);
+            color: var(--light-color);
             font-size: 1.2rem;
             max-width: 700px;
             margin: 0 auto;
+            opacity: 0.9;
         }
         
         .games-grid {
@@ -81,17 +100,51 @@
         }
         
         .game-card {
-            background: white;
+            background: rgba(15, 12, 41, 0.7);
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
             position: relative;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #6c5ce7, #fd79a8, #00f3ff, #6c5ce7);
+            background-size: 400%;
+            border-radius: 12px;
+            z-index: -1;
+            opacity: 0;
+            transition: 0.5s;
+        }
+        
+        .game-card:hover::before {
+            opacity: 1;
+            animation: borderGlow 3s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% {
+                background-position: 0 0;
+            }
+            50% {
+                background-position: 300% 0;
+            }
+            100% {
+                background-position: 0 0;
+            }
         }
         
         .game-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 15px 30px rgba(0, 243, 255, 0.3);
         }
         
         .game-card a {
@@ -107,9 +160,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f5f5f5;
-            border-bottom: 1px solid #eee;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             overflow: hidden;
+            position: relative;
         }
         
         .game-image {
@@ -117,10 +171,11 @@
             max-width: 100%;
             object-fit: contain;
             transition: transform 0.3s ease;
+            filter: drop-shadow(0 0 5px rgba(0, 243, 255, 0.5));
         }
         
         .game-card:hover .game-image {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
         
         .game-info {
@@ -130,12 +185,13 @@
         .game-title {
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: var(--primary-color);
+            color: var(--neon-color);
             font-size: 1.3rem;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
         }
         
         .game-desc {
-            color: var(--dark-color);
+            color: var(--light-color);
             opacity: 0.8;
             font-size: 0.9rem;
             margin-bottom: 1rem;
@@ -143,26 +199,48 @@
         
         .play-btn {
             display: inline-block;
-            background-color: var(--primary-color);
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.5rem;
             border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+        }
+        
+        .play-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
         }
         
         .game-card:hover .play-btn {
-            background-color: var(--accent-color);
+            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
             transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(253, 121, 168, 0.7);
+        }
+        
+        .game-card:hover .play-btn::before {
+            left: 100%;
         }
         
         footer {
             text-align: center;
             margin-top: 4rem;
             padding-top: 2rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-            color: var(--dark-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--light-color);
             opacity: 0.7;
+            font-size: 0.9rem;
         }
         
         /* Estilos para los anuncios */
@@ -172,34 +250,40 @@
             justify-content: center;
             align-items: center;
             min-height: 100px;
-            background-color: #f5f5f5;
+            background-color: rgba(0, 0, 0, 0.3);
             border-radius: 8px;
             padding: 1rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         /* Estilos para el bloque de donaciones */
         .donation-section {
-            background-color: #f8f9fa;
+            background: rgba(0, 0, 0, 0.4);
             border-radius: 10px;
-            padding: 1.5rem;
+            padding: 2rem;
             margin: 2rem 0;
             text-align: center;
-            border: 1px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
         }
         
         .donation-title {
             font-size: 1.5rem;
-            color: var(--primary-color);
+            color: var(--neon-color);
             margin-bottom: 1rem;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
         }
         
         .donation-text {
             margin-bottom: 1.5rem;
-            color: var(--dark-color);
+            color: var(--light-color);
+            opacity: 0.9;
         }
         
         .paypal-button {
-            background-color: #0070ba;
+            background: linear-gradient(45deg, #0070ba, #00a8e8);
             color: white;
             border: none;
             padding: 0.8rem 1.5rem;
@@ -210,11 +294,31 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0, 168, 232, 0.5);
+            position: relative;
+            overflow: hidden;
         }
         
         .paypal-button:hover {
-            background-color: #005ea6;
-            transform: translateY(-2px);
+            background: linear-gradient(45deg, #00a8e8, #0070ba);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 168, 232, 0.7);
+        }
+        
+        .paypal-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .paypal-button:hover::after {
+            left: 100%;
         }
         
         .paypal-button img {
@@ -222,9 +326,115 @@
             height: 20px;
         }
         
+        /* Nuevos estilos para la versión y estado */
+        .game-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .game-version {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+        
+        .game-status {
+            color: var(--accent-color);
+            font-style: italic;
+        }
+        
+        /* Efecto de cursor personalizado */
+        body {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2300f3ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'), auto;
+        }
+        
+        a, button {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%2300f3ff" stroke="%2300f3ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>'), pointer;
+        }
+        
+        /* Efecto de carga */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0c29;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top-color: var(--neon-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: relative;
+        }
+        
+        .loader::before, .loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 5px solid transparent;
+        }
+        
+        .loader::before {
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border-top-color: var(--accent-color);
+            animation: spin 2s linear infinite;
+        }
+        
+        .loader::after {
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border-top-color: var(--primary-color);
+            animation: spin 3s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Efecto de scroll personalizado */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0f0c29;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(var(--accent-color), var(--primary-color));
+        }
     </style>
 </head>
 <body>
+    <!-- Efecto de carga -->
+    <div class="loader-wrapper">
+        <div class="loader"></div>
+    </div>
+    
+    <!-- Efecto de partículas -->
+    <div id="particles-js"></div>
     
     <div class="container">
         <header>
@@ -256,6 +466,10 @@
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">Adivina la Carta</h3>
+                        <div class="game-meta">
+                            <span class="game-version">Versión 1.2.1🗒️</span>
+                            <span class="game-status">Sin Mantenimiento🔩</span>
+                        </div>
                         <p class="game-desc">¿Podrás adivinar si la próxima carta será mayor o menor? Pon a prueba tu intuición en este emocionante juego de cartas.</p>
                         <span class="play-btn">Jugar Ahora</span>
                     </div>
@@ -271,6 +485,10 @@
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">Snake Clásico</h3>
+                        <div class="game-meta">
+                            <span class="game-version">Versión 1.2.1🗒️</span>
+                            <span class="game-status">Sin Mantenimiento🔩</span>
+                        </div>
                         <p class="game-desc">El clásico juego de la serpiente. Come la mayor cantidad de frutas posible sin chocar contra las paredes o contra ti mismo.</p>
                         <span class="play-btn">Jugar Ahora</span>
                     </div>
@@ -286,6 +504,10 @@
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">Ahorcado</h3>
+                        <div class="game-meta">
+                            <span class="game-version">Versión 1.2.1🗒️</span>
+                            <span class="game-status">Sin Mantenimiento🔩</span>
+                        </div>
                         <p class="game-desc">Adivina la palabra letra por letra antes de que se complete el dibujo del ahorcado. ¡Pon a prueba tu vocabulario!</p>
                         <span class="play-btn">Jugar Ahora</span>
                     </div>
@@ -301,6 +523,10 @@
                     </div>
                     <div class="game-info">
                         <h3 class="game-title">Adivina el Número</h3>
+                        <div class="game-meta">
+                            <span class="game-version">Versión 1.2.1🗒️</span>
+                            <span class="game-status">Sin Mantenimiento🔩</span>
+                        </div>
                         <p class="game-desc">Intenta adivinar el número secreto en la menor cantidad de intentos posible. ¡Cada pista te acerca a la victoria!</p>
                         <span class="play-btn">Jugar Ahora</span>
                     </div>
@@ -321,24 +547,154 @@
             </script>
         </div>
         
-<div class="donation-section">
-    <h2 class="donation-title">¡Apoya este proyecto!</h2>
-    <p class="donation-text">Si disfrutas de estos juegos, considera hacer una donación para ayudar a mantener y mejorar este sitio y agregar más juegos html.</p>
-    
-    <a href="Donación/Donación.html" 
-       target="_blank" 
-       class="paypal-button" 
-       style="text-decoration: none; display: inline-block;">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal Logo">
-        Ver opciones de donación
-    </a>
-</div>
+        <div class="donation-section">
+            <h2 class="donation-title">¡Apoya este proyecto!</h2>
+            <p class="donation-text">Si disfrutas de estos juegos, considera hacer una donación para ayudar a mantener y mejorar este sitio y agregar más juegos html.</p>
+            
+            <a href="Donación/Donación.html" 
+               target="_blank" 
+               class="paypal-button" 
+               style="text-decoration: none; display: inline-block;">
+                <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal Logo">
+                Ver opciones de donación
+            </a>
+        </div>
         
         <footer>
             <p>© 2023 Colección de Juegos HTML | Creado con ❤️ por <strong>Luis04</strong> | JavaScript</p>
         </footer>
     </div>
 
+    <!-- Script para partículas -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        // Efecto de carga
+        window.addEventListener('load', function() {
+            const loaderWrapper = document.querySelector('.loader-wrapper');
+            loaderWrapper.style.opacity = '0';
+            setTimeout(() => {
+                loaderWrapper.style.display = 'none';
+            }, 500);
+        });
+        
+        // Configuración de partículas
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#00f3ff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#6c5ce7",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+            
+            // Efecto de sonido al hacer hover en los botones
+            const buttons = document.querySelectorAll('.play-btn, .paypal-button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', () => {
+                    const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3');
+                    audio.volume = 0.2;
+                    audio.play();
+                });
+            });
+        });
     </script>
 </body>
 </html>
