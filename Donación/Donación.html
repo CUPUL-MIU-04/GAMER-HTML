@@ -14,6 +14,10 @@
             --primary-color: #6c5ce7;
             --primary-light: #a29bfe;
             --primary-dark: #5649c0;
+            --neon-pink: #ff2d75;
+            --neon-blue: #00f3ff;
+            --neon-purple: #9d00ff;
+            --neon-green: #00ff9d;
             --accent-color: #fd79a8;
             --dark-color: #2d3436;
             --light-color: #f5f6fa;
@@ -48,7 +52,7 @@
         .container {
             max-width: 1000px;
             margin: 2rem auto;
-            background: rgba(0, 0, 0, 0.0);
+            background: rgba(25, 25, 45, 0.85);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             padding: 2rem;
@@ -66,8 +70,9 @@
         .donation-section {
             margin: 3rem 0;
             padding: 2rem;
-            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(162, 155, 254, 0.1) 0%);
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1) 0%, rgba(162, 155, 254, 0.1) 100%);
             border-radius: 15px;
+            border: 1px solid rgba(108, 92, 231, 0.3);
             position: relative;
             overflow: hidden;
         }
@@ -359,7 +364,7 @@
             <div class="donation-grid">
                 <!-- Tarjeta de PayPal -->
                 <div class="donation-card">
-                    <img src="https://www.top-bank.ch/images/logo_540/paypal.png" alt="PayPal" class="payment-logo">
+                    <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal" class="payment-logo">
                     <h3 class="donation-card-title"><i class="fab fa-paypal"></i> Donar con PayPal</h3>
                     
                     <div class="amount-options" id="paypal-amounts">
@@ -393,6 +398,8 @@
         
         <footer>
             <p>© <span id="current-year">2023</span> Juegos HTML | Creado con <i class="fas fa-heart" style="color: var(--accent-color);"></i></p>
+</span> POR <strong style="color: var(--neon-blue);">LUIS04</strong> | <span style="color: var(--neon-green);">JAVASCRIPT</span> | <span style="color: var(--neon-purple);">VERSIÓN 2.0</span></p>
+            </div>
         </footer>
     </div>
 
