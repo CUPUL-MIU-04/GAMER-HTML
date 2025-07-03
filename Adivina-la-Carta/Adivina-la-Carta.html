@@ -8,17 +8,29 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            background-color: #f0f0f0;
             margin: 0;
             padding: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
+        
+        /* Canvas para las partículas */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
         #menu {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(52, 152, 219, 0.9);
+            background-color: rgba(52, 152, 219, 0.7);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -29,6 +41,7 @@
             color: white;
             font-size: 2.5em;
             margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
         #menu button {
             padding: 12px 25px;
@@ -39,25 +52,40 @@
             border-radius: 5px;
             font-size: 1.2em;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
         }
         #menu button:hover {
             background-color: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
         }
         #game-container {
             display: none;
             margin: 20px auto;
             max-width: 600px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         #level-info {
             font-size: 1.2em;
             margin: 15px 0;
-            color: #2c3e50;
+            color: #fff;
         }
         #score {
             font-size: 1.5em;
             font-weight: bold;
-            color: #e74c3c;
+            color: #f1c40f;
+            margin: 10px 0;
+            text-shadow: 0 0 5px rgba(241, 196, 15, 0.5);
+        }
+        #attempts {
+            font-size: 1.2em;
+            color: #fff;
             margin: 10px 0;
         }
         .cards-container {
@@ -70,7 +98,7 @@
         .card {
             width: 80px;
             height: 120px;
-            background-color: #3498db;
+            background: rgba(52, 152, 219, 0.8);
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -78,27 +106,37 @@
             font-size: 1.8em;
             color: white;
             cursor: pointer;
-            transition: transform 0.3s, background-color 0.3s;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.6);
         }
         .card.selected {
-            background-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.8);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
         }
         .card.winner {
-            background-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.8);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            animation: pulse 0.5s infinite alternate;
+        }
+        .card.disabled {
+            opacity: 0.6;
+            pointer-events: none;
         }
         #message {
             font-size: 1.2em;
             margin: 15px 0;
             min-height: 30px;
-            color: #9b59b6;
+            color: #f1c40f;
+            font-weight: bold;
         }
         #next-btn {
             padding: 10px 20px;
-            background-color: #9b59b6;
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
             color: white;
             border: none;
             border-radius: 5px;
@@ -106,17 +144,37 @@
             cursor: pointer;
             margin-top: 10px;
             display: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(155, 89, 182, 0.4);
         }
         #next-btn:hover {
-            background-color: #8e44ad;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 89, 182, 0.6);
+        }
+        #restart-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+        #restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.6);
         }
         .credits {
             position: fixed;
             bottom: 10px;
             right: 10px;
             font-size: 14px;
-            color: #7f8c8d;
+            color: rgba(255,255,255,0.7);
             font-style: italic;
+            z-index: 101;
         }
         
         /* Estilos para el anti-adblock */
@@ -186,9 +244,16 @@
             0% { background-position: 0% 50%; }
             100% { background-position: 400% 50%; }
         }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
     </style>
 </head>
 <body>
+    <!-- Canvas para partículas -->
+    <div id="particles-js"></div>
+
     <!-- Anti-Adblock Warning -->
     <div id="adblock-warning">
         <h2>¡ADBLOCK DETECTADO!</h2>
@@ -201,7 +266,7 @@
     <div id="menu">
         <h1>🎴 Adivina la Carta</h1>
         <p style="color: white; max-width: 80%; margin-bottom: 30px;">
-            Encuentra la carta ganadora entre las opciones. ¡Solo tienes 1 intento por nivel!
+            Encuentra la carta ganadora entre las opciones. ¡Tienes 3 intentos por nivel!
         </p>
         <button onclick="startGame()">Comenzar</button>
         <button onclick="showInstructions()">Instrucciones</button>
@@ -211,14 +276,127 @@
     <div id="game-container">
         <div id="level-info">Nivel 1: 3 cartas</div>
         <div id="score">Puntos: 0</div>
+        <div id="attempts">Intentos restantes: 3</div>
         <div id="message"></div>
         <div class="cards-container" id="cards"></div>
-        <button id="next-btn" onclick="nextLevel()">Siguiente Nivel</button>
+        <button id="restart-btn" onclick="restartGame()">Reiniciar Juego</button>
     </div>
     
-    <div class="credits">Creado por Luis04</div>
+    <div class="credits">Creado por Luis04 / Versión 3.0.9</div>
 
+    <!-- Script de partículas -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <script>
+        // Inicializar partículas
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": true,
+                            "speed": 2,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": true,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": true,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+        });
+
         // Detección de AdBlock
         function checkAdBlock() {
             return new Promise((resolve) => {
@@ -261,9 +439,10 @@
         // Variables del juego
         let currentLevel = 1;
         let score = 0;
+        let attemptsLeft = 3;
         let winningCardIndex = 0;
         let cards = [];
-        let hasAttempt = false;
+        let gameActive = true;
 
         // Elementos del DOM
         const menu = document.getElementById('menu');
@@ -271,32 +450,51 @@
         const cardsContainer = document.getElementById('cards');
         const levelInfo = document.getElementById('level-info');
         const scoreDisplay = document.getElementById('score');
+        const attemptsDisplay = document.getElementById('attempts');
         const messageDisplay = document.getElementById('message');
-        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
 
         // Mostrar instrucciones
         function showInstructions() {
-            alert("INSTRUCCIONES:\n\n1. Selecciona una carta para revelarla.\n2. Solo tienes 1 intento por nivel.\n3. Cada nivel aumenta el número de cartas.\n4. Gana puntos por cada acierto.");
+            alert("INSTRUCCIONES:\n\n1. Selecciona una carta para revelarla.\n2. Tienes 3 intentos por nivel.\n3. Cada nivel aumenta el número de cartas.\n4. Gana puntos por cada acierto.\n5. Al acertar, pasarás automáticamente al siguiente nivel.\n6. Si usas todos tus intentos, el juego termina.");
         }
 
         // Iniciar juego
         function startGame() {
             menu.style.display = 'none';
             gameContainer.style.display = 'block';
+            resetGame();
+            generateLevel();
+        }
+
+        // Reiniciar juego completamente
+        function resetGame() {
             currentLevel = 1;
             score = 0;
+            attemptsLeft = 3;
+            gameActive = true;
             scoreDisplay.textContent = `Puntos: ${score}`;
-            generateLevel();
+            attemptsDisplay.textContent = `Intentos restantes: ${attemptsLeft}`;
+            messageDisplay.textContent = '';
+        }
+
+        // Reiniciar juego desde el principio
+        function restartGame() {
+            gameActive = true;
+            startGame();
         }
 
         // Generar nivel
         function generateLevel() {
-            hasAttempt = false;
+            if (!gameActive) return;
+            
+            attemptsLeft = 3;
+            attemptsDisplay.textContent = `Intentos restantes: ${attemptsLeft}`;
             messageDisplay.textContent = '';
-            nextBtn.style.display = 'none';
             const numCards = currentLevel + 2; // 3, 4, 5...
             levelInfo.textContent = `Nivel ${currentLevel}: ${numCards} cartas`;
             cardsContainer.innerHTML = '';
+            cards = [];
             
             // Crear cartas
             for (let i = 0; i < numCards; i++) {
@@ -314,32 +512,86 @@
 
         // Seleccionar carta
         function selectCard(index) {
-            if (hasAttempt) return;
-            hasAttempt = true;
+            if (!gameActive || attemptsLeft <= 0 || cards[index].classList.contains('selected')) return;
             
             cards[index].classList.add('selected');
             cards[index].textContent = index === winningCardIndex ? '🎉' : '❌';
             
             if (index === winningCardIndex) {
+                // Acierto
                 cards[index].classList.add('winner');
                 score += currentLevel * 10;
                 scoreDisplay.textContent = `Puntos: ${score}`;
                 messageDisplay.textContent = '¡Correcto! +' + (currentLevel * 10) + ' puntos';
-                nextBtn.style.display = 'block';
+                
+                // Efecto de confeti al ganar
+                for (let i = 0; i < 30; i++) {
+                    createConfetti();
+                }
+                
+                // Deshabilitar todas las cartas
+                cards.forEach(card => card.classList.add('disabled'));
+                
+                // Avanzar automáticamente al siguiente nivel después de 1 segundo
+                setTimeout(() => {
+                    currentLevel++;
+                    generateLevel();
+                }, 1000);
             } else {
-                messageDisplay.textContent = 'Fallaste. La carta ganadora era la #' + (winningCardIndex + 1);
-                setTimeout(() => nextLevel(), 1500);
+                // Fallo
+                attemptsLeft--;
+                attemptsDisplay.textContent = `Intentos restantes: ${attemptsLeft}`;
+                
+                if (attemptsLeft <= 0) {
+                    messageDisplay.textContent = '¡Se acabaron los intentos! La carta ganadora era la #' + (winningCardIndex + 1);
+                    gameActive = false;
+                    
+                    // Mostrar la carta ganadora
+                    cards[winningCardIndex].textContent = '🎉';
+                    cards[winningCardIndex].classList.add('winner');
+                    
+                    // Deshabilitar todas las cartas
+                    cards.forEach(card => card.classList.add('disabled'));
+                    
+                    setTimeout(() => {
+                        if (confirm('¿Quieres reiniciar el juego?')) {
+                            restartGame();
+                        }
+                    }, 1500);
+                } else {
+                    messageDisplay.textContent = 'Intenta de nuevo. ¡Tú puedes!';
+                }
             }
-            
-            // Bloquear otras cartas
-            cards.forEach(card => card.style.pointerEvents = 'none');
         }
 
-        // Siguiente nivel
-        function nextLevel() {
-            currentLevel++;
-            cards = [];
-            generateLevel();
+        // Crear efecto de confeti
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = getRandomColor();
+            confetti.style.borderRadius = '50%';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.zIndex = '1000';
+            confetti.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { top: '-10px', opacity: 1 },
+                { top: '100vh', opacity: 0 }
+            ], {
+                duration: 2000 + Math.random() * 3000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
+            });
+            
+            animation.onfinish = () => confetti.remove();
+        }
+        
+        function getRandomColor() {
+            const colors = ['#f1c40f', '#e74c3c', '#3498db', '#2ecc71', '#9b59b6', '#1abc9c'];
+            return colors[Math.floor(Math.random() * colors.length)];
         }
 
         // Iniciar detección de AdBlock al cargar la página
