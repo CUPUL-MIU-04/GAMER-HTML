@@ -3,293 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juego de Inteligencia</title>
+    <title>Juego de Inteligencia Épico</title>
     <style>
+        /* Estilos generales */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f0f2f5;
             color: #333;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
         }
+
+        /* Partículas en el fondo */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: transparent;
+        }
+
         .game-container {
-            background-color: white;
+            background-color: rgba(255, 255, 255, 0.95);
             padding: 25px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
             flex: 1;
             display: flex;
             flex-direction: column;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
         }
+
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
-            font-size: 2.2em;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            padding-bottom: 15px;
         }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3498db, transparent);
+            border-radius: 3px;
+        }
+
         .menu-container {
             display: flex;
             justify-content: center;
             align-items: center;
             flex: 1;
         }
+
         .menu {
             text-align: center;
             width: 100%;
         }
+
         .menu-btn {
-            padding: 12px 25px;
-            font-size: 1.1em;
-            margin: 10px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            margin: 15px;
             cursor: pointer;
-            background-color: #3498db;
+            background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
             border: none;
-            border-radius: 8px;
-            transition: all 0.3s;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            width: 200px;
+            border-radius: 50px;
+            transition: all 0.4s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 250px;
             display: inline-block;
+            font-weight: bold;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
         }
+
         .menu-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #2980b9, #3498db);
         }
+
         .menu-btn:active {
             transform: translateY(0);
         }
+
+        .menu-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .menu-btn:hover::before {
+            left: 100%;
+        }
+
         .game-screen {
             display: none;
             flex: 1;
             flex-direction: column;
+            animation: fadeIn 0.5s ease;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .question {
-            font-size: 1.3em;
-            margin-bottom: 15px;
+            font-size: 1.4em;
+            margin-bottom: 20px;
             font-weight: bold;
-            line-height: 1.4;
+            line-height: 1.5;
             color: #2c3e50;
-            min-height: 60px;
+            min-height: 80px;
+            padding: 15px;
+            background-color: rgba(236, 240, 241, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
         }
+
         .options {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 15px;
+            margin-bottom: 25px;
         }
+
         .option-btn {
-            padding: 12px;
-            font-size: 1em;
+            padding: 15px;
+            font-size: 1.1em;
             cursor: pointer;
             background-color: #ecf0f1;
             color: #2c3e50;
             border: 2px solid #bdc3c7;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.3s;
             text-align: left;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
         }
+
         .option-btn:hover {
             background-color: #d6eaf8;
             border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
         }
+
         .option-btn.correct {
             background-color: #2ecc71;
             color: white;
             border-color: #27ae60;
+            animation: pulse 0.5s;
         }
+
         .option-btn.incorrect {
             background-color: #e74c3c;
             color: white;
             border-color: #c0392b;
         }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
         .level-indicator {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             font-weight: bold;
-            font-size: 1.1em;
+            font-size: 1.3em;
             color: #7f8c8d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
         .difficulty-badge {
             display: inline-block;
-            padding: 3px 10px;
-            border-radius: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
             font-size: 0.9em;
-            margin-left: 8px;
+            margin-left: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
+
         .easy {
-            background-color: #2ecc71;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
             color: white;
         }
+
         .medium {
-            background-color: #f39c12;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
             color: white;
         }
+
         .hard {
-            background-color: #e74c3c;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
             color: white;
         }
+
         .expert {
-            background-color: #9b59b6;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
             color: white;
         }
+
         .extreme {
-            background-color: #34495e;
+            background: linear-gradient(135deg, #34495e, #2c3e50);
             color: white;
         }
+
         .score {
             text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 15px;
+            font-size: 1.3em;
+            margin-bottom: 20px;
             color: #2c3e50;
+            font-weight: bold;
+            background-color: rgba(236, 240, 241, 0.7);
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
+
         .progress-container {
             width: 100%;
             background-color: #ecf0f1;
             border-radius: 10px;
-            margin-bottom: 20px;
-            height: 10px;
+            margin-bottom: 25px;
+            height: 12px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+
         .progress-bar {
             height: 100%;
             background: linear-gradient(90deg, #2ecc71, #3498db);
             border-radius: 10px;
             width: 0%;
             transition: width 0.5s ease;
+            position: relative;
+            overflow: hidden;
         }
+
+        .progress-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
         .timer-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
         .timer {
-            font-size: 1.3em;
+            font-size: 1.5em;
             font-weight: bold;
             color: #e74c3c;
             background-color: #fdedec;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 50px;
             display: inline-flex;
             align-items: center;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e74c3c;
         }
+
         .timer-icon {
-            margin-right: 8px;
-            font-size: 1.2em;
+            margin-right: 10px;
+            font-size: 1.3em;
+            animation: pulse 1.5s infinite;
         }
+
         .result {
             text-align: center;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            min-height: 30px;
-            padding: 10px;
-            border-radius: 8px;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            min-height: 40px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
         }
+
+        .result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .correct-result {
             background-color: #d5f5e3;
             color: #27ae60;
+            border: 2px solid #2ecc71;
         }
+
         .incorrect-result {
             background-color: #fadbd8;
             color: #e74c3c;
+            border: 2px solid #e74c3c;
         }
+
         .next-btn {
             display: block;
             margin: 0 auto;
-            background-color: #3498db;
-            padding: 12px 30px;
-            font-size: 1.1em;
-            border-radius: 8px;
-            transition: all 0.3s;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            transition: all 0.4s;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
         .next-btn:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #2980b9, #3498db);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
         }
+
         .game-over {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             display: none;
             flex: 1;
             flex-direction: column;
             justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease;
         }
+
         .game-over h2 {
             color: #e74c3c;
-            font-size: 2em;
-            margin-bottom: 20px;
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
+
+        .game-over h2::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #e74c3c, transparent);
+            border-radius: 3px;
+        }
+
         .game-over p {
-            font-size: 1.2em;
-            margin-bottom: 10px;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            color: #2c3e50;
         }
+
         .final-score {
-            font-size: 1.5em;
+            font-size: 2em;
             color: #2c3e50;
             font-weight: bold;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #3498db, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .max-level {
-            font-size: 1.3em;
+            font-size: 1.5em;
             color: #3498db;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         }
+
         .restart-btn {
-            background-color: #2ecc71;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
             margin-top: 30px;
-            padding: 12px 30px;
-            font-size: 1.1em;
-            transition: all 0.3s;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            transition: all 0.4s;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+
         .restart-btn:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
         }
+
         .instructions {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
+            background-color: rgba(248, 249, 250, 0.9);
+            padding: 30px;
+            border-radius: 15px;
             margin-bottom: 30px;
             border-left: 5px solid #3498db;
             display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
         }
+
         .instructions h3 {
             margin-top: 0;
             color: #2c3e50;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
         }
+
+        .instructions h3::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3498db, transparent);
+            border-radius: 3px;
+        }
+
         .instructions ul {
             padding-left: 20px;
+            font-size: 1.1em;
+            line-height: 1.6;
         }
+
+        .instructions li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .instructions li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+
         .category {
-            font-size: 0.9em;
+            font-size: 1em;
             color: #7f8c8d;
             font-style: italic;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            background-color: rgba(236, 240, 241, 0.7);
+            padding: 8px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0 auto 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .correct-answer {
             animation: correctPulse 0.5s;
         }
+
         @keyframes correctPulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(46, 204, 113, 0.5); }
             100% { transform: scale(1); }
+        }
+
+        /* CRÉDITOS MEJORADOS */
+        .credits-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 100;
+            perspective: 1000px;
+        }
+
+        .credits-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .credits-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .credits-modal {
+            position: fixed;
+            bottom: 50px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            width: 250px;
+            display: none;
+            z-index: 101;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform-origin: bottom right;
+            animation: modalFadeIn 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.5) rotateX(20deg); }
+            to { opacity: 1; transform: scale(1) rotateX(0); }
+        }
+
+        .credits-modal h3 {
+            margin-top: 0;
+            color: #3498db;
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .credits-modal p {
+            margin: 5px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .credits-modal .version {
+            color: #C700FF;
+            font-style: italic;
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.8em;
+        }
+
+        .credits-modal .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        /* Efecto de confeti para victoria */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            opacity: 0;
+            z-index: 9999;
+            animation: confettiFall 5s linear forwards;
+        }
+
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Efecto de estrella para respuestas correctas */
+        .star-effect {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23FFD700"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>');
+            background-size: contain;
+            opacity: 0;
+            z-index: 10;
+            animation: starPop 0.5s ease-out forwards;
+        }
+
+        @keyframes starPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Partículas en el fondo -->
+    <div id="particles-js"></div>
+    
     <div class="game-container">
-        <h1>🧠 Juego de Inteligencia 🧠</h1>
+        <h1>🧠 Juego de Inteligencia Épico 🧠</h1>
         
         <!-- Menú principal -->
         <div class="menu-container">
             <div class="menu" id="menu">
-                <button class="menu-btn" id="start-btn">Comenzar Juego</button>
-                <button class="menu-btn" id="instructions-btn">Instrucciones</button>
+                <button class="menu-btn" id="start-btn">🚀 Comenzar Juego</button>
+                <button class="menu-btn" id="instructions-btn">📖 Instrucciones</button>
             </div>
         </div>
         
@@ -305,7 +680,7 @@
                 <li>Al responder correctamente, pasarás automáticamente a la siguiente pregunta</li>
                 <li>¡Llega al nivel Extremo para convertirte en un genio!</li>
             </ul>
-            <button class="menu-btn" id="back-btn" style="background-color: #95a5a6; margin-top: 20px;">Volver al Menú</button>
+            <button class="menu-btn" id="back-btn" style="background: linear-gradient(135deg, #95a5a6, #7f8c8d); margin-top: 20px;">← Volver al Menú</button>
         </div>
         
         <!-- Pantalla de juego -->
@@ -335,19 +710,36 @@
             
             <div class="result" id="result"></div>
             
-            <button class="next-btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+            <button class="next-btn" id="next-btn" style="display: none;">Siguiente Pregunta →</button>
         </div>
         
         <!-- Pantalla de Game Over -->
         <div class="game-over" id="game-over">
             <h2>¡GAME OVER!</h2>
             <p>Se acabó el tiempo</p>
-            <p>Tu puntuación final: <span class="final-score" id="final-score">0</span></p>
+            <p class="final-score" id="final-score">0</p>
             <p>Nivel alcanzado: <span class="max-level" id="max-level">1</span></p>
-            <button class="menu-btn restart-btn" id="restart-btn">Jugar de Nuevo</button>
+            <button class="menu-btn restart-btn" id="restart-btn">🔄 Jugar de Nuevo</button>
         </div>
     </div>
 
+    <!-- Créditos mejorados -->
+    <div class="credits-container">
+        <button class="credits-btn" id="credits-btn">Créditos</button>
+        <div class="credits-modal" id="credits-modal">
+            <button class="close-btn" id="close-credits">×</button>
+            <h3>Créditos</h3>
+            <p><strong>Desarrollador:</strong> Luis04</p>
+            <p><strong>Diseño:</strong> Luis04</p>
+            <p><strong>Preguntas:</strong> Varias fuentes</p>
+            <p><strong>Efectos visuales:</strong> Partículas.js</p>
+            <p class="version">Versión 3.2.0</p>
+        </div>
+    </div>
+
+    <!-- Script de partículas -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
     <script>
         // Variables del juego
         let currentLevel = 1;
@@ -652,6 +1044,7 @@
                     question: "¿Qué científico descubrió los electrones?",
                     options: ["Rutherford", "Thomson", "Bohr", "Curie"],
                     answer: 1,
+                    color: "#2ecc71",
                     category: "Física"
                 },
                 {
@@ -706,6 +1099,9 @@
         const startButton = document.getElementById('start-btn');
         const instructionsButton = document.getElementById('instructions-btn');
         const backButton = document.getElementById('back-btn');
+        const creditsBtn = document.getElementById('credits-btn');
+        const creditsModal = document.getElementById('credits-modal');
+        const closeCredits = document.getElementById('close-credits');
 
         // Iniciar juego
         function startGame() {
@@ -773,12 +1169,14 @@
             // Marcar respuesta correcta e incorrecta
             if (selectedIndex === correctIndex) {
                 resultElement.textContent = '¡Correcto! +' + (currentLevel * 10) + ' puntos';
-                resultElement.className = 'result correct-result';
+                resultElement.className = 'result correct-result show';
                 score += currentLevel * 10; // Más puntos por niveles más difíciles
                 updateScore();
                 
                 // Animación de respuesta correcta
                 questionElement.classList.add('correct-answer');
+                createStarEffects();
+                
                 setTimeout(() => {
                     questionElement.classList.remove('correct-answer');
                 }, 500);
@@ -790,7 +1188,7 @@
                 }, 1500);
             } else {
                 resultElement.textContent = `Incorrecto. La respuesta correcta es: ${question.options[correctIndex]}`;
-                resultElement.className = 'result incorrect-result';
+                resultElement.className = 'result incorrect-result show';
                 nextButton.style.display = 'block';
             }
             
@@ -799,6 +1197,24 @@
             
             // Detener temporizador
             clearInterval(timer);
+        }
+
+        // Crear efectos de estrella para respuestas correctas
+        function createStarEffects() {
+            for (let i = 0; i < 10; i++) {
+                const star = document.createElement('div');
+                star.className = 'star-effect';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+                star.style.animationDelay = `${Math.random() * 0.5}s`;
+                document.body.appendChild(star);
+                
+                // Eliminar después de la animación
+                setTimeout(() => {
+                    star.remove();
+                }, 1000);
+            }
         }
 
         // Siguiente pregunta
@@ -810,10 +1226,32 @@
                     updateLevel();
                 } else {
                     endGame(true);
+                    createConfetti();
                     return;
                 }
             }
             loadQuestion();
+        }
+
+        // Crear efecto de confeti para victoria
+        function createConfetti() {
+            const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+            
+            for (let i = 0; i < 150; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.width = `${Math.random() * 10 + 5}px`;
+                confetti.style.height = `${Math.random() * 10 + 5}px`;
+                confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+                document.body.appendChild(confetti);
+                
+                // Eliminar después de la animación
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
         }
 
         // Finalizar juego
@@ -824,9 +1262,12 @@
             
             if (victory) {
                 document.querySelector('.game-over h2').textContent = '¡Felicidades!';
+                document.querySelector('.game-over h2').style.color = '#2ecc71';
                 document.querySelector('.game-over p:nth-of-type(1)').textContent = '¡Has completado todos los niveles!';
+                createConfetti();
             } else {
                 document.querySelector('.game-over h2').textContent = '¡GAME OVER!';
+                document.querySelector('.game-over h2').style.color = '#e74c3c';
                 document.querySelector('.game-over p:nth-of-type(1)').textContent = 'Se acabó el tiempo';
             }
             
@@ -896,6 +1337,124 @@
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Cambiar color cuando el tiempo es crítico
+            if (timeLeft <= 10) {
+                timerElement.style.color = '#e74c3c';
+                timerElement.style.animation = 'pulse 0.5s infinite';
+            } else {
+                timerElement.style.color = '#e74c3c';
+                timerElement.style.animation = 'none';
+            }
+        }
+
+        // Inicializar partículas
+        function initParticles() {
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#ffffff"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#ffffff",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
         }
 
         // Event listeners
@@ -904,6 +1463,22 @@
         startButton.addEventListener('click', startGame);
         instructionsButton.addEventListener('click', showInstructions);
         backButton.addEventListener('click', backToMenu);
+        
+        // Créditos
+        creditsBtn.addEventListener('click', () => {
+            creditsModal.style.display = 'block';
+        });
+        
+        closeCredits.addEventListener('click', () => {
+            creditsModal.style.display = 'none';
+        });
+        
+        // Cerrar créditos al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (e.target === creditsModal) {
+                creditsModal.style.display = 'none';
+            }
+        });
 
         // Iniciar el menú al cargar la página
         window.onload = () => {
@@ -911,7 +1486,8 @@
             gameScreenElement.style.display = 'none';
             gameOverElement.style.display = 'none';
             instructionsElement.style.display = 'none';
+            initParticles();
         };
     </script>
 </body>
-  </html>
+</html>
