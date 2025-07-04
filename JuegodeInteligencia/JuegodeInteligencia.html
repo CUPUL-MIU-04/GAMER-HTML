@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Inteligencia</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .game-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        .menu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+        .menu {
+            text-align: center;
+            width: 100%;
+        }
+        .menu-btn {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            width: 200px;
+            display: inline-block;
+        }
+        .menu-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        .menu-btn:active {
+            transform: translateY(0);
+        }
+        .game-screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+        }
+        .question {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+            line-height: 1.4;
+            color: #2c3e50;
+            min-height: 60px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .option-btn {
+            padding: 12px;
+            font-size: 1em;
+            cursor: pointer;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .option-btn:hover {
+            background-color: #d6eaf8;
+            border-color: #3498db;
+        }
+        .option-btn.correct {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+        .option-btn.incorrect {
+            background-color: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+        .level-indicator {
+            text-align: center;
+            margin-bottom: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #7f8c8d;
+        }
+        .difficulty-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin-left: 8px;
+        }
+        .easy {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .medium {
+            background-color: #f39c12;
+            color: white;
+        }
+        .hard {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .expert {
+            background-color: #9b59b6;
+            color: white;
+        }
+        .extreme {
+            background-color: #34495e;
+            color: white;
+        }
+        .score {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ecf0f1;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #2ecc71, #3498db);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .timer {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #e74c3c;
+            background-color: #fdedec;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .timer-icon {
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        .result {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            min-height: 30px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .correct-result {
+            background-color: #d5f5e3;
+            color: #27ae60;
+        }
+        .incorrect-result {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+        .next-btn {
+            display: block;
+            margin: 0 auto;
+            background-color: #3498db;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .next-btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        .game-over {
+            text-align: center;
+            padding: 20px;
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .game-over h2 {
+            color: #e74c3c;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .game-over p {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .final-score {
+            font-size: 1.5em;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .max-level {
+            font-size: 1.3em;
+            color: #3498db;
+        }
+        .restart-btn {
+            background-color: #2ecc71;
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            transition: all 0.3s;
+        }
+        .restart-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+            display: none;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .instructions ul {
+            padding-left: 20px;
+        }
+        .category {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            font-style: italic;
+            margin-bottom: 15px;
+        }
+        .correct-answer {
+            animation: correctPulse 0.5s;
+        }
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🧠 Juego de Inteligencia 🧠</h1>
+        
+        <!-- Menú principal -->
+        <div class="menu-container">
+            <div class="menu" id="menu">
+                <button class="menu-btn" id="start-btn">Comenzar Juego</button>
+                <button class="menu-btn" id="instructions-btn">Instrucciones</button>
+            </div>
+        </div>
+        
+        <!-- Instrucciones -->
+        <div class="instructions" id="instructions">
+            <h3>¿Cómo jugar?</h3>
+            <ul>
+                <li>Responde preguntas de diferentes categorías y dificultades</li>
+                <li>Cada nivel tiene 5 preguntas que debes responder</li>
+                <li>El tiempo disminuye a medida que avanzas de nivel</li>
+                <li>Obtienes más puntos por preguntas difíciles</li>
+                <li>Si se acaba el tiempo, pierdes el juego</li>
+                <li>Al responder correctamente, pasarás automáticamente a la siguiente pregunta</li>
+                <li>¡Llega al nivel Extremo para convertirte en un genio!</li>
+            </ul>
+            <button class="menu-btn" id="back-btn" style="background-color: #95a5a6; margin-top: 20px;">Volver al Menú</button>
+        </div>
+        
+        <!-- Pantalla de juego -->
+        <div class="game-screen" id="game-screen">
+            <div class="level-indicator">
+                Nivel: <span id="level">1</span>
+                <span class="difficulty-badge easy" id="difficulty">Fácil</span>
+            </div>
+            
+            <div class="score">Puntuación: <span id="score">0</span></div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
+            
+            <div class="timer-container">
+                <div class="timer">
+                    <span class="timer-icon">⏱️</span>
+                    <span id="timer">01:00</span>
+                </div>
+            </div>
+            
+            <div class="question" id="question"></div>
+            <div class="category" id="category"></div>
+            
+            <div class="options" id="options"></div>
+            
+            <div class="result" id="result"></div>
+            
+            <button class="next-btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
+        </div>
+        
+        <!-- Pantalla de Game Over -->
+        <div class="game-over" id="game-over">
+            <h2>¡GAME OVER!</h2>
+            <p>Se acabó el tiempo</p>
+            <p>Tu puntuación final: <span class="final-score" id="final-score">0</span></p>
+            <p>Nivel alcanzado: <span class="max-level" id="max-level">1</span></p>
+            <button class="menu-btn restart-btn" id="restart-btn">Jugar de Nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables del juego
+        let currentLevel = 1;
+        let score = 0;
+        let timer;
+        let timeLeft = 60;
+        let questionsAnswered = 0;
+        const questionsPerLevel = 5;
+        const maxLevel = 5;
+        let currentQuestionIndex = 0;
+        let gameActive = false;
+        let autoNextTimeout;
+
+        // Preguntas por nivel de dificultad y categoría
+        const questions = {
+            1: [
+                {
+                    question: "¿Cuál es la capital de Francia?",
+                    options: ["Madrid", "París", "Roma", "Berlín"],
+                    answer: 1,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Cuántos lados tiene un triángulo?",
+                    options: ["2", "3", "4", "5"],
+                    answer: 1,
+                    category: "Matemáticas"
+                },
+                {
+                    question: "¿Qué planeta es conocido como el planeta rojo?",
+                    options: ["Venus", "Marte", "Júpiter", "Saturno"],
+                    answer: 1,
+                    category: "Astronomía"
+                },
+                {
+                    question: "¿Cuál es el resultado de 2 + 2?",
+                    options: ["3", "4", "5", "6"],
+                    answer: 1,
+                    category: "Matemáticas"
+                },
+                {
+                    question: "¿Qué animal es conocido como el 'rey de la selva'?",
+                    options: ["Elefante", "Tigre", "León", "Jirafa"],
+                    answer: 2,
+                    category: "Zoología"
+                },
+                {
+                    question: "¿Cuál es el océano más grande del mundo?",
+                    options: ["Atlántico", "Índico", "Pacífico", "Ártico"],
+                    answer: 2,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué tipo de animal es una ballena?",
+                    options: ["Pez", "Anfibio", "Reptil", "Mamífero"],
+                    answer: 3,
+                    category: "Zoología"
+                },
+                {
+                    question: "¿En qué continente se encuentra Egipto?",
+                    options: ["Asia", "África", "Europa", "América"],
+                    answer: 1,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Cuál es el hueso más largo del cuerpo humano?",
+                    options: ["Húmero", "Tibia", "Fémur", "Cráneo"],
+                    answer: 2,
+                    category: "Anatomía"
+                },
+                {
+                    question: "¿Qué gas necesitan las plantas para realizar la fotosíntesis?",
+                    options: ["Oxígeno", "Nitrógeno", "Dióxido de carbono", "Hidrógeno"],
+                    answer: 2,
+                    category: "Biología"
+                }
+            ],
+            2: [
+                {
+                    question: "¿En qué año llegó el hombre a la luna?",
+                    options: ["1965", "1969", "1972", "1975"],
+                    answer: 1,
+                    category: "Historia"
+                },
+                {
+                    question: "¿Cuál es el río más largo del mundo?",
+                    options: ["Nilo", "Amazonas", "Yangtsé", "Misisipi"],
+                    answer: 0,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Quién pintó la Mona Lisa?",
+                    options: ["Picasso", "Van Gogh", "Da Vinci", "Miguel Ángel"],
+                    answer: 2,
+                    category: "Arte"
+                },
+                {
+                    question: "¿Qué elemento químico tiene el símbolo 'O'?",
+                    options: ["Oro", "Osmio", "Oxígeno", "Oganesón"],
+                    answer: 2,
+                    category: "Química"
+                },
+                {
+                    question: "¿Cuál es la capital de Australia?",
+                    options: ["Sídney", "Melbourne", "Canberra", "Brisbane"],
+                    answer: 2,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué famoso científico formuló la teoría de la relatividad?",
+                    options: ["Newton", "Einstein", "Galileo", "Tesla"],
+                    answer: 1,
+                    category: "Ciencia"
+                },
+                {
+                    question: "¿Cuál es el país más grande del mundo por área?",
+                    options: ["China", "Estados Unidos", "Canadá", "Rusia"],
+                    answer: 3,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué órgano del cuerpo humano produce insulina?",
+                    options: ["Hígado", "Páncreas", "Riñón", "Estómago"],
+                    answer: 1,
+                    category: "Anatomía"
+                },
+                {
+                    question: "¿En qué año comenzó la Segunda Guerra Mundial?",
+                    options: ["1937", "1939", "1941", "1943"],
+                    answer: 1,
+                    category: "Historia"
+                },
+                {
+                    question: "¿Cuál es el metal más abundante en la corteza terrestre?",
+                    options: ["Hierro", "Aluminio", "Oro", "Cobre"],
+                    answer: 1,
+                    category: "Geología"
+                }
+            ],
+            3: [
+                {
+                    question: "¿Cuál es la fórmula química del agua?",
+                    options: ["CO2", "H2O", "NaCl", "O2"],
+                    answer: 1,
+                    category: "Química"
+                },
+                {
+                    question: "¿Qué famoso filósofo dijo 'Pienso, luego existo'?",
+                    options: ["Platón", "Aristóteles", "Descartes", "Kant"],
+                    answer: 2,
+                    category: "Filosofía"
+                },
+                {
+                    question: "¿Qué famoso compositor era sordo?",
+                    options: ["Mozart", "Bach", "Beethoven", "Chopin"],
+                    answer: 2,
+                    category: "Música"
+                },
+                {
+                    question: "¿Cuál es el elemento químico con número atómico 1?",
+                    options: ["Helio", "Hidrógeno", "Litio", "Berilio"],
+                    answer: 1,
+                    category: "Química"
+                },
+                {
+                    question: "¿Qué científico descubrió la penicilina?",
+                    options: ["Marie Curie", "Alexander Fleming", "Louis Pasteur", "Robert Koch"],
+                    answer: 1,
+                    category: "Ciencia"
+                },
+                {
+                    question: "¿En qué año cayó el Muro de Berlín?",
+                    options: ["1985", "1989", "1991", "1993"],
+                    answer: 1,
+                    category: "Historia"
+                },
+                {
+                    question: "¿Qué planeta tiene los anillos más visibles?",
+                    options: ["Júpiter", "Saturno", "Urano", "Neptuno"],
+                    answer: 1,
+                    category: "Astronomía"
+                },
+                {
+                    question: "¿Cuál es el hueso más pequeño del cuerpo humano?",
+                    options: ["Vértebra", "Estribo", "Martillo", "Yunque"],
+                    answer: 1,
+                    category: "Anatomía"
+                },
+                {
+                    question: "¿Qué artista pintó 'La noche estrellada'?",
+                    options: ["Picasso", "Van Gogh", "Dalí", "Monet"],
+                    answer: 1,
+                    category: "Arte"
+                },
+                {
+                    question: "¿Cuál es la velocidad de la luz en el vacío (aproximadamente)?",
+                    options: ["300 km/s", "3,000 km/s", "30,000 km/s", "300,000 km/s"],
+                    answer: 3,
+                    category: "Física"
+                }
+            ],
+            4: [
+                {
+                    question: "¿Qué famoso matemático griego es conocido por su teorema sobre triángulos rectángulos?",
+                    options: ["Arquímedes", "Euclides", "Pitágoras", "Tales"],
+                    answer: 2,
+                    category: "Matemáticas"
+                },
+                {
+                    question: "¿Qué famoso pintor se cortó una oreja?",
+                    options: ["Picasso", "Van Gogh", "Dalí", "Monet"],
+                    answer: 1,
+                    category: "Arte"
+                },
+                {
+                    question: "¿Cuál es la capital de Canadá?",
+                    options: ["Toronto", "Montreal", "Vancouver", "Ottawa"],
+                    answer: 3,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué elemento tiene el símbolo químico 'Au'?",
+                    options: ["Plata", "Oro", "Aluminio", "Argón"],
+                    answer: 1,
+                    category: "Química"
+                },
+                {
+                    question: "¿En qué año se fundó Google?",
+                    options: ["1996", "1998", "2000", "2002"],
+                    answer: 1,
+                    category: "Tecnología"
+                },
+                {
+                    question: "¿Qué país tiene la forma de una bota?",
+                    options: ["Grecia", "Portugal", "Italia", "España"],
+                    answer: 2,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Cuál es el libro más vendido de la historia después de la Biblia?",
+                    options: ["Don Quijote", "El Principito", "Cien años de soledad", "Historia de dos ciudades"],
+                    answer: 0,
+                    category: "Literatura"
+                },
+                {
+                    question: "¿Qué científico propuso las tres leyes del movimiento?",
+                    options: ["Galileo", "Einstein", "Newton", "Tesla"],
+                    answer: 2,
+                    category: "Física"
+                },
+                {
+                    question: "¿Cuál es el país con más husos horarios?",
+                    options: ["Rusia", "Estados Unidos", "China", "Francia"],
+                    answer: 3,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué planeta tiene la mayor cantidad de lunas?",
+                    options: ["Júpiter", "Saturno", "Urano", "Neptuno"],
+                    answer: 1,
+                    category: "Astronomía"
+                }
+            ],
+            5: [
+                {
+                    question: "¿Cuál es la montaña más alta del mundo?",
+                    options: ["K2", "Monte Everest", "Aconcagua", "Denali"],
+                    answer: 1,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué famoso matemático indio hizo contribuciones significativas a la teoría de números?",
+                    options: ["Aryabhata", "Brahmagupta", "Ramanujan", "Bhaskara"],
+                    answer: 2,
+                    category: "Matemáticas"
+                },
+                {
+                    question: "¿Qué premio no forma parte de los Premios Nobel?",
+                    options: ["Física", "Química", "Matemáticas", "Literatura"],
+                    answer: 2,
+                    category: "Premios"
+                },
+                {
+                    question: "¿Qué elemento tiene el punto de fusión más alto?",
+                    options: ["Oro", "Tungsteno", "Hierro", "Platino"],
+                    answer: 1,
+                    category: "Química"
+                },
+                {
+                    question: "¿Cuál es el país con más islas en el mundo?",
+                    options: ["Filipinas", "Indonesia", "Suecia", "Japón"],
+                    answer: 2,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué filósofo escribió 'Así habló Zaratustra'?",
+                    options: ["Kant", "Nietzsche", "Hegel", "Schopenhauer"],
+                    answer: 1,
+                    category: "Filosofía"
+                },
+                {
+                    question: "¿Qué científico descubrió los electrones?",
+                    options: ["Rutherford", "Thomson", "Bohr", "Curie"],
+                    answer: 1,
+                    category: "Física"
+                },
+                {
+                    question: "¿Cuál es el lago más profundo del mundo?",
+                    options: ["Lago Titicaca", "Lago Baikal", "Lago Superior", "Lago Victoria"],
+                    answer: 1,
+                    category: "Geografía"
+                },
+                {
+                    question: "¿Qué artista renacentista pintó la Capilla Sixtina?",
+                    options: ["Da Vinci", "Miguel Ángel", "Rafael", "Donatello"],
+                    answer: 1,
+                    category: "Arte"
+                },
+                {
+                    question: "¿Qué país tiene la costa más larga del mundo?",
+                    options: ["Rusia", "Canadá", "Australia", "Estados Unidos"],
+                    answer: 1,
+                    category: "Geografía"
+                }
+            ]
+        };
+
+        // Dificultades por nivel
+        const difficulties = {
+            1: {name: "Fácil", class: "easy", time: 60},
+            2: {name: "Intermedio", class: "medium", time: 50},
+            3: {name: "Difícil", class: "hard", time: 40},
+            4: {name: "Experto", class: "expert", time: 30},
+            5: {name: "Extremo", class: "extreme", time: 25}
+        };
+
+        // Elementos del DOM
+        const menuElement = document.getElementById('menu');
+        const menuContainerElement = document.querySelector('.menu-container');
+        const instructionsElement = document.getElementById('instructions');
+        const gameScreenElement = document.getElementById('game-screen');
+        const gameOverElement = document.getElementById('game-over');
+        const questionElement = document.getElementById('question');
+        const categoryElement = document.getElementById('category');
+        const optionsElement = document.getElementById('options');
+        const resultElement = document.getElementById('result');
+        const nextButton = document.getElementById('next-btn');
+        const scoreElement = document.getElementById('score');
+        const levelElement = document.getElementById('level');
+        const difficultyElement = document.getElementById('difficulty');
+        const progressBar = document.getElementById('progress');
+        const finalScoreElement = document.getElementById('final-score');
+        const maxLevelElement = document.getElementById('max-level');
+        const restartButton = document.getElementById('restart-btn');
+        const timerElement = document.getElementById('timer');
+        const startButton = document.getElementById('start-btn');
+        const instructionsButton = document.getElementById('instructions-btn');
+        const backButton = document.getElementById('back-btn');
+
+        // Iniciar juego
+        function startGame() {
+            currentLevel = 1;
+            score = 0;
+            questionsAnswered = 0;
+            gameActive = true;
+            
+            menuContainerElement.style.display = 'none';
+            instructionsElement.style.display = 'none';
+            gameScreenElement.style.display = 'flex';
+            gameOverElement.style.display = 'none';
+            
+            updateScore();
+            updateLevel();
+            loadQuestion();
+            startTimer();
+        }
+
+        // Cargar pregunta
+        function loadQuestion() {
+            const levelQuestions = questions[currentLevel];
+            currentQuestionIndex = Math.floor(Math.random() * levelQuestions.length);
+            const question = levelQuestions[currentQuestionIndex];
+            
+            questionElement.textContent = question.question;
+            categoryElement.textContent = question.category;
+            optionsElement.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(index);
+                optionsElement.appendChild(button);
+            });
+            
+            resultElement.textContent = '';
+            resultElement.className = 'result';
+            nextButton.style.display = 'none';
+            
+            // Reiniciar temporizador
+            resetTimer();
+        }
+
+        // Verificar respuesta
+        function checkAnswer(selectedIndex) {
+            if (!gameActive) return;
+            
+            const levelQuestions = questions[currentLevel];
+            const question = levelQuestions[currentQuestionIndex];
+            const correctIndex = question.answer;
+            
+            // Deshabilitar todos los botones
+            const buttons = optionsElement.querySelectorAll('.option-btn');
+            buttons.forEach(button => {
+                button.disabled = true;
+                if (parseInt(button.textContent) === question.options[correctIndex]) {
+                    button.classList.add('correct');
+                } else if (parseInt(button.textContent) === question.options[selectedIndex]) {
+                    button.classList.add('incorrect');
+                }
+            });
+            
+            // Marcar respuesta correcta e incorrecta
+            if (selectedIndex === correctIndex) {
+                resultElement.textContent = '¡Correcto! +' + (currentLevel * 10) + ' puntos';
+                resultElement.className = 'result correct-result';
+                score += currentLevel * 10; // Más puntos por niveles más difíciles
+                updateScore();
+                
+                // Animación de respuesta correcta
+                questionElement.classList.add('correct-answer');
+                setTimeout(() => {
+                    questionElement.classList.remove('correct-answer');
+                }, 500);
+                
+                // Pasar automáticamente a la siguiente pregunta después de 1.5 segundos
+                clearTimeout(autoNextTimeout);
+                autoNextTimeout = setTimeout(() => {
+                    nextQuestion();
+                }, 1500);
+            } else {
+                resultElement.textContent = `Incorrecto. La respuesta correcta es: ${question.options[correctIndex]}`;
+                resultElement.className = 'result incorrect-result';
+                nextButton.style.display = 'block';
+            }
+            
+            questionsAnswered++;
+            updateProgress();
+            
+            // Detener temporizador
+            clearInterval(timer);
+        }
+
+        // Siguiente pregunta
+        function nextQuestion() {
+            if (questionsAnswered >= questionsPerLevel) {
+                if (currentLevel < maxLevel) {
+                    currentLevel++;
+                    questionsAnswered = 0;
+                    updateLevel();
+                } else {
+                    endGame(true);
+                    return;
+                }
+            }
+            loadQuestion();
+        }
+
+        // Finalizar juego
+        function endGame(victory) {
+            gameActive = false;
+            gameOverElement.style.display = 'flex';
+            gameScreenElement.style.display = 'none';
+            
+            if (victory) {
+                document.querySelector('.game-over h2').textContent = '¡Felicidades!';
+                document.querySelector('.game-over p:nth-of-type(1)').textContent = '¡Has completado todos los niveles!';
+            } else {
+                document.querySelector('.game-over h2').textContent = '¡GAME OVER!';
+                document.querySelector('.game-over p:nth-of-type(1)').textContent = 'Se acabó el tiempo';
+            }
+            
+            finalScoreElement.textContent = score;
+            maxLevelElement.textContent = difficulties[currentLevel].name;
+        }
+
+        // Reiniciar juego
+        function restartGame() {
+            gameOverElement.style.display = 'none';
+            startGame();
+        }
+
+        // Volver al menú
+        function backToMenu() {
+            instructionsElement.style.display = 'none';
+            gameOverElement.style.display = 'none';
+            gameScreenElement.style.display = 'none';
+            menuContainerElement.style.display = 'flex';
+        }
+
+        // Mostrar instrucciones
+        function showInstructions() {
+            menuContainerElement.style.display = 'none';
+            instructionsElement.style.display = 'block';
+        }
+
+        // Actualizar puntuación
+        function updateScore() {
+            scoreElement.textContent = score;
+        }
+
+        // Actualizar nivel
+        function updateLevel() {
+            levelElement.textContent = currentLevel;
+            difficultyElement.textContent = difficulties[currentLevel].name;
+            difficultyElement.className = 'difficulty-badge ' + difficulties[currentLevel].class;
+        }
+
+        // Actualizar barra de progreso
+        function updateProgress() {
+            const progress = (questionsAnswered / questionsPerLevel) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Temporizador
+        function startTimer() {
+            resetTimer();
+            timer = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timeLeft = difficulties[currentLevel].time;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Event listeners
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartGame);
+        startButton.addEventListener('click', startGame);
+        instructionsButton.addEventListener('click', showInstructions);
+        backButton.addEventListener('click', backToMenu);
+
+        // Iniciar el menú al cargar la página
+        window.onload = () => {
+            menuContainerElement.style.display = 'flex';
+            gameScreenElement.style.display = 'none';
+            gameOverElement.style.display = 'none';
+            instructionsElement.style.display = 'none';
+        };
+    </script>
+</body>
+  </html>
