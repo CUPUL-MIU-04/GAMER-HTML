@@ -279,6 +279,17 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        
+        /* CRÉDITOS */
+        .credits {
+            position: fixed;
+            bottom: 5px;
+            right: 5px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-style: italic;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -337,6 +348,8 @@
             
             <button class="next-btn" id="next-btn" style="display: none;">Siguiente Pregunta</button>
         </div>
+        
+    <div class="credits">Creado por Luis04 / Versión 5.1</div>
         
         <!-- Pantalla de Game Over -->
         <div class="game-over" id="game-over">
@@ -914,4 +927,4 @@
         };
     </script>
 </body>
-  </html>
+</html>
