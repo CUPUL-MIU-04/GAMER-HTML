@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Obstacle Rush Ultra HD</title>
+    <style>
+        :root {
+            --player-color: #4CAF50;
+            --obstacle-color: #f44336;
+            --powerup-color: #FFD700;
+            --shield-color: #2196F3;
+            --slowmo-color: #9C27B0;
+        }
+        
+        * {
+            box-sizing: border-box;
+            touch-action: manipulation;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+        
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 70vh;
+            max-height: 600px;
+            margin: 0 auto;
+            box-shadow: 0 0 50px rgba(0, 0, 255, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #2c3e50, #1a1a2e);
+            overflow: hidden;
+        }
+        
+        #player {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--player-color);
+            border-radius: 50%;
+            z-index: 20;
+            box-shadow: 0 0 15px var(--player-color);
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .obstacle {
+            position: absolute;
+            border-radius: 8px;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+            transition: transform 0.2s;
+        }
+        
+        .powerup {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            z-index: 15;
+            animation: pulse 1.5s infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        #shield {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: transparent;
+            border: 3px dashed var(--shield-color);
+            z-index: 19;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 30;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .hud-item {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            text-shadow: 1px 1px 3px black;
+        }
+        
+        .hud-icon {
+            margin-right: 8px;
+            font-size: 20px;
+        }
+        
+        #game-over, #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 40;
+            text-align: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        
+        #start-screen {
+            display: flex;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            margin: 15px 0;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            min-width: 200px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #controls {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 20px;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        
+        .control-btn {
+            padding: 20px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        #joystick-area {
+            position: absolute;
+            bottom: 100px;
+            left: 50px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: none;
+            z-index: 25;
+        }
+        
+        #joystick {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            top: 25px;
+            left: 25px;
+            transition: transform 0.1s;
+        }
+        
+        #particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: white;
+            opacity: 0.7;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            #game-wrapper {
+                height: 60vh;
+            }
+            
+            #controls {
+                display: flex;
+            }
+            
+            #joystick-area {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-wrapper">
+        <div id="game-container">
+            <div id="particles"></div>
+            <div id="player">:)</div>
+            <div id="shield"></div>
+            
+            <div id="hud">
+                <div class="hud-item"><span class="hud-icon">⭐</span><span id="score-display">0</span></div>
+                <div class="hud-item"><span class="hud-icon">🚀</span><span id="level-display">Sencillo</span></div>
+                <div class="hud-item"><span class="hud-icon">🌀</span><span id="mode-display">Horizontal</span></div>
+                <div class="hud-item"><span class="hud-icon">⏱️</span><span id="slowmo-display">0</span>s</div>
+            </div>
+            
+            <div id="game-over">
+                <h1>¡Game Over!</h1>
+                <div class="stats"><span class="hud-icon">⭐</span><span id="final-score">0</span></div>
+                <div class="stats"><span class="hud-icon">🚀</span><span id="final-level">Sencillo</span></div>
+                <div class="stats"><span class="hud-icon">⌛</span><span id="game-time">00:00</span></div>
+                <button onclick="resetGame()">Jugar de Nuevo</button>
+            </div>
+            
+            <div id="start-screen">
+                <h1>OBSTACLE RUSH ULTRA</h1>
+                <p>Esquiva los obstáculos y recolecta power-ups</p>
+                <p id="instructions-pc">PC: Usa las flechas del teclado</p>
+                <p id="instructions-mobile">Móvil: Desliza o usa los botones</p>
+                <button onclick="startGame()">Comenzar</button>
+            </div>
+            
+            <div id="joystick-area">
+                <div id="joystick"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <button class="control-btn" id="btn-left">←</button>
+        <button class="control-btn" id="btn-up">↑</button>
+        <button class="control-btn" id="btn-down">↓</button>
+        <button class="control-btn" id="btn-right">→</button>
+    </div>
+
+    <script>
+        // Variables del juego
+        const player = document.getElementById('player');
+        const shield = document.getElementById('shield');
+        const gameContainer = document.getElementById('game-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const levelDisplay = document.getElementById('level-display');
+        const modeDisplay = document.getElementById('mode-display');
+        const slowmoDisplay = document.getElementById('slowmo-display');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScore = document.getElementById('final-score');
+        const finalLevel = document.getElementById('final-level');
+        const gameTimeDisplay = document.getElementById('game-time');
+        const startScreen = document.getElementById('start-screen');
+        const particlesContainer = document.getElementById('particles');
+        const joystickArea = document.getElementById('joystick-area');
+        const joystick = document.getElementById('joystick');
+        
+        // Elementos de control
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        const btnUp = document.getElementById('btn-up');
+        const btnDown = document.getElementById('btn-down');
+        
+        let gameRunning = false;
+        let score = 0;
+        let level = 1;
+        let playerX = 50;
+        let playerY = 50;
+        let playerSpeed = 5;
+        let obstacleSpeed = 3;
+        let obstacleFrequency = 1500;
+        let powerupFrequency = 10000;
+        let lastObstacleTime = 0;
+        let lastPowerupTime = 0;
+        let obstacles = [];
+        let powerups = [];
+        let animationId;
+        let isHorizontalMode = true;
+        let modeChangeCounter = 0;
+        let modeChangeInterval = 15;
+        let hasShield = false;
+        let slowmoTime = 0;
+        let slowmoActive = false;
+        let gameStartTime = 0;
+        let isMobile = false;
+        let joystickActive = false;
+        let joystickX = 0;
+        let joystickY = 0;
+        
+        // Niveles del juego
+        const levels = [
+            { name: "Sencillo", speed: 3, frequency: 1500, color: "#f44336" },
+            { name: "Fácil", speed: 4, frequency: 1200, color: "#ff9800" },
+            { name: "Normal", speed: 5, frequency: 1000, color: "#ffeb3b" },
+            { name: "Difícil", speed: 6, frequency: 800, color: "#2196F3" },
+            { name: "Ultra", speed: 7, frequency: 600, color: "#9c27b0" },
+            { name: "Extremo", speed: 8, frequency: 500, color: "#e91e63" },
+            { name: "IMPOSIBLE", speed: 12, frequency: 300, color: "#000000" }
+        ];
+        
+        // Power-ups
+        const powerupTypes = [
+            { 
+                name: "Escudo", 
+                color: "#2196F3", 
+                symbol: "🛡️", 
+                effect: () => activateShield(),
+                duration: 10000 
+            },
+            { 
+                name: "Slow Motion", 
+                color: "#9C27B0", 
+                symbol: "⏱️", 
+                effect: () => activateSlowMo(),
+                duration: 5000 
+            },
+            { 
+                name: "Puntos x2", 
+                color: "#FFD700", 
+                symbol: "💰", 
+                effect: () => startDoublePoints(),
+                duration: 8000 
+            },
+            { 
+                name: "Invencible", 
+                color: "#00FF00", 
+                symbol: "💎", 
+                effect: () => activateInvincible(),
+                duration: 4000 
+            }
+        ];
+        
+        // Controles
+        const keys = {
+            ArrowLeft: false,
+            ArrowRight: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+        
+        // Inicializar el juego
+        function initGame() {
+            isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                setupMobileControls();
+            } else {
+                setupKeyboardControls();
+            }
+            
+            // Configurar controles táctiles de botones
+            setupButtonControls();
+            
+            // Iniciar pantalla de inicio
+            startScreen.style.display = "flex";
+            gameOverScreen.style.display = "none";
+        }
+        
+        function setupMobileControls() {
+            // Controles táctiles de deslizamiento
+            gameContainer.addEventListener('touchstart', handleTouchStart, { passive: false });
+            gameContainer.addEventListener('touchmove', handleTouchMove, { passive: false });
+            gameContainer.addEventListener('touchend', handleTouchEnd);
+            
+            // Mostrar joystick virtual
+            joystickArea.style.display = "block";
+        }
+        
+        function setupKeyboardControls() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key in keys) {
+                    keys[e.key] = true;
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                if (e.key in keys) {
+                    keys[e.key] = false;
+                    e.preventDefault();
+                }
+            });
+        }
+        
+        function setupButtonControls() {
+            // Configurar eventos para los botones de control
+            const buttons = [btnLeft, btnRight, btnUp, btnDown];
+            const keyNames = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+            
+            buttons.forEach((btn, index) => {
+                // Eventos para móvil
+                btn.addEventListener('touchstart', () => {
+                    keys[keyNames[index]] = true;
+                });
+                
+                btn.addEventListener('touchend', () => {
+                    keys[keyNames[index]] = false;
+                });
+                
+                // Eventos para PC (pruebas con mouse)
+                btn.addEventListener('mousedown', () => {
+                    keys[keyNames[index]] = true;
+                });
+                
+                btn.addEventListener('mouseup', () => {
+                    keys[keyNames[index]] = false;
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    keys[keyNames[index]] = false;
+                });
+            });
+        }
+        
+        // Manejar controles táctiles
+        function handleTouchStart(e) {
+            const touch = e.touches[0];
+            const rect = gameContainer.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+            
+            // Verificar si el toque está en el área del joystick
+            const joystickRect = joystickArea.getBoundingClientRect();
+            const joystickCenterX = joystickRect.left + joystickRect.width/2 - rect.left;
+            const joystickCenterY = joystickRect.top + joystickRect.height/2 - rect.top;
+            
+            if (Math.sqrt(Math.pow(touchX - joystickCenterX, 2) + Math.pow(touchY - joystickCenterY, 2)) < joystickRect.width/2) {
+                joystickActive = true;
+                updateJoystick(touchX, touchY, joystickCenterX, joystickCenterY);
+                e.preventDefault();
+            }
+        }
+        
+        function handleTouchMove(e) {
+            if (!joystickActive) return;
+            
+            const touch = e.touches[0];
+            const rect = gameContainer.getBoundingClientRect();
+            const touchX = touch.clientX - rect.left;
+            const touchY = touch.clientY - rect.top;
+            
+            const joystickRect = joystickArea.getBoundingClientRect();
+            const joystickCenterX = joystickRect.left + joystickRect.width/2 - rect.left;
+            const joystickCenterY = joystickRect.top + joystickRect.height/2 - rect.top;
+            
+            updateJoystick(touchX, touchY, joystickCenterX, joystickCenterY);
+            e.preventDefault();
+        }
+        
+        function handleTouchEnd() {
+            joystickActive = false;
+            resetJoystick();
+        }
+        
+        function updateJoystick(touchX, touchY, centerX, centerY) {
+            const deltaX = touchX - centerX;
+            const deltaY = touchY - centerY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = joystickArea.offsetWidth / 2;
+            
+            // Calcular dirección del joystick
+            const angle = Math.atan2(deltaY, deltaX);
+            const distanceRatio = Math.min(distance, maxDistance) / maxDistance;
+            
+            // Actualizar posición visual del joystick
+            joystickX = Math.cos(angle) * distanceRatio;
+            joystickY = Math.sin(angle) * distanceRatio;
+            
+            joystick.style.transform = `translate(${joystickX * 25}px, ${joystickY * 25}px)`;
+            
+            // Actualizar controles basados en la dirección
+            updateControlsFromJoystick();
+        }
+        
+        function resetJoystick() {
+            joystick.style.transform = 'translate(0, 0)';
+            joystickX = 0;
+            joystickY = 0;
+            updateControlsFromJoystick();
+        }
+        
+        function updateControlsFromJoystick() {
+            const threshold = 0.3;
+            
+            // Izquierda/Derecha
+            if (joystickX < -threshold) {
+                keys.ArrowLeft = true;
+                keys.ArrowRight = false;
+            } else if (joystickX > threshold) {
+                keys.ArrowRight = true;
+                keys.ArrowLeft = false;
+            } else {
+                keys.ArrowLeft = false;
+                keys.ArrowRight = false;
+            }
+            
+            // Arriba/Abajo
+            if (joystickY < -threshold) {
+                keys.ArrowUp = true;
+                keys.ArrowDown = false;
+            } else if (joystickY > threshold) {
+                keys.ArrowDown = true;
+                keys.ArrowUp = false;
+            } else {
+                keys.ArrowUp = false;
+                keys.ArrowDown = false;
+            }
+        }
+        
+        // Iniciar juego
+        function startGame() {
+            startScreen.style.display = "none";
+            gameRunning = true;
+            score = 0;
+            level = 1;
+            modeChangeCounter = 0;
+            isHorizontalMode = true;
+            hasShield = false;
+            slowmoTime = 0;
+            slowmoActive = false;
+            gameStartTime = Date.now();
+            
+            updateLevel();
+            updateMode();
+            scoreDisplay.textContent = score;
+            lastObstacleTime = Date.now();
+            lastPowerupTime = Date.now();
+            
+            // Posición inicial del jugador
+            playerX = gameContainer.offsetWidth / 2 - 15;
+            playerY = gameContainer.offsetHeight - 50;
+            updatePlayerPosition();
+            
+            // Limpiar obstáculos y power-ups anteriores
+            clearGameElements();
+            
+            // Iniciar bucle del juego
+            gameLoop();
+            
+            // Iniciar generador de partículas
+            createParticles();
+        }
+        
+        // Reiniciar juego
+        function resetGame() {
+            gameOverScreen.style.display = "none";
+            clearGameElements();
+            startGame();
+        }
+        
+        function clearGameElements() {
+            // Eliminar todos los obstáculos y power-ups
+            obstacles.forEach(obstacle => obstacle.element.remove());
+            obstacles = [];
+            
+            powerups.forEach(powerup => powerup.element.remove());
+            powerups = [];
+        }
+        
+        // Actualizar nivel
+        function updateLevel() {
+            const currentLevel = levels[level - 1];
+            levelDisplay.textContent = currentLevel.name;
+            obstacleSpeed = currentLevel.speed;
+            obstacleFrequency = currentLevel.frequency;
+        }
+        
+        // Actualizar modo (horizontal/vertical)
+        function updateMode() {
+            modeDisplay.textContent = isHorizontalMode ? 'Horizontal' : 'Vertical';
+            modeDisplay.style.color = isHorizontalMode ? '#00d2ff' : '#ff6b6b';
+        }
+        
+        // Cambiar modo
+        function changeMode() {
+            isHorizontalMode = !isHorizontalMode;
+            updateMode();
+            modeChangeCounter = 0;
+            
+            // Limpiar obstáculos del modo anterior
+            obstacles.forEach(obstacle => obstacle.element.remove());
+            obstacles = [];
+            lastObstacleTime = Date.now();
+            
+            // Efecto visual al cambiar modo
+            createModeChangeEffect();
+        }
+        
+        function createModeChangeEffect() {
+            // Crear partículas de efecto
+            for (let i = 0; i < 30; i++) {
+                createParticle(
+                    gameContainer.offsetWidth / 2,
+                    gameContainer.offsetHeight / 2,
+                    isHorizontalMode ? '#00d2ff' : '#ff6b6b'
+                );
+            }
+        }
+        
+        // Crear obstáculo
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            
+            const currentLevel = levels[level - 1];
+            obstacle.style.backgroundColor = currentLevel.color;
+            
+            if (isHorizontalMode) {
+                // Obstáculo horizontal (se mueve de derecha a izquierda)
+                const height = Math.floor(Math.random() * 40) + 30;
+                const top = Math.floor(Math.random() * (gameContainer.offsetHeight - height - 50)) + 20;
+                
+                obstacle.style.width = `${Math.floor(Math.random() * 30) + 40}px`;
+                obstacle.style.height = `${height}px`;
+                obstacle.style.top = `${top}px`;
+                obstacle.style.right = '0px';
+                obstacle.style.left = 'auto';
+            } else {
+                // Obstáculo vertical (se mueve de arriba a abajo)
+                const width = Math.floor(Math.random() * 40) + 30;
+                const left = Math.floor(Math.random() * (gameContainer.offsetWidth - width - 50)) + 20;
+                
+                obstacle.style.width = `${width}px`;
+                obstacle.style.height = `${Math.floor(Math.random() * 30) + 40}px`;
+                obstacle.style.left = `${left}px`;
+                obstacle.style.top = '0px';
+                obstacle.style.right = 'auto';
+            }
+            
+            gameContainer.appendChild(obstacle);
+            
+            obstacles.push({
+                element: obstacle,
+                x: isHorizontalMode ? gameContainer.offsetWidth : 
+                   Math.floor(Math.random() * (gameContainer.offsetWidth - 40)),
+                y: isHorizontalMode ? 
+                   Math.floor(Math.random() * (gameContainer.offsetHeight - 40)) : 0,
+                width: parseInt(obstacle.style.width),
+                height: parseInt(obstacle.style.height),
+                isHorizontal: isHorizontalMode
+            });
+        }
+        
+        // Crear power-up
+        function createPowerup() {
+            const powerupType = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
+            const powerup = document.createElement('div');
+            powerup.className = 'powerup';
+            
+            powerup.textContent = powerupType.symbol;
+            powerup.style.backgroundColor = powerupType.color;
+            powerup.style.left = `${Math.floor(Math.random() * (gameContainer.offsetWidth - 50)) + 25}px`;
+            powerup.style.top = `${Math.floor(Math.random() * (gameContainer.offsetHeight - 50)) + 25}px`;
+            
+            gameContainer.appendChild(powerup);
+            
+            powerups.push({
+                element: powerup,
+                x: parseInt(powerup.style.left),
+                y: parseInt(powerup.style.top),
+                width: 25,
+                height: 25,
+                type: powerupType
+            });
+        }
+        
+        // Actualizar posición del jugador
+        function updatePlayerPosition() {
+            player.style.left = `${playerX}px`;
+            player.style.top = `${playerY}px`;
+            
+            // Efecto de inclinación al moverse
+            if (keys.ArrowLeft) {
+                player.style.transform = 'rotate(-15deg)';
+            } else if (keys.ArrowRight) {
+                player.style.transform = 'rotate(15deg)';
+            } else {
+                player.style.transform = 'rotate(0)';
+            }
+        }
+        
+        // Actualizar escudo
+        function updateShield() {
+            if (hasShield) {
+                shield.style.left = `${playerX - 5}px`;
+                shield.style.top = `${playerY - 5}px`;
+                shield.style.opacity = '0.7';
+            } else {
+                shield.style.opacity = '0';
+            }
+        }
+        
+        // Activar escudo
+        function activateShield() {
+            hasShield = true;
+            shield.style.borderColor = '#2196F3';
+            player.style.boxShadow = '0 0 20px #2196F3';
+            
+            setTimeout(() => {
+                hasShield = false;
+                player.style.boxShadow = '0 0 15px #4CAF50';
+            }, 10000);
+        }
+        
+        // Activar slow motion
+        function activateSlowMo() {
+            slowmoActive = true;
+            slowmoTime = 5;
+            updateSlowmoDisplay();
+            
+            const interval = setInterval(() => {
+                slowmoTime--;
+                updateSlowmoDisplay();
+                
+                if (slowmoTime <= 0) {
+                    clearInterval(interval);
+                    slowmoActive = false;
+                }
+            }, 1000);
+        }
+        
+        function updateSlowmoDisplay() {
+            slowmoDisplay.textContent = slowmoTime;
+            slowmoDisplay.style.color = slowmoActive ? '#9C27B0' : 'white';
+        }
+        
+        // Activar puntos dobles
+        function startDoublePoints() {
+            const originalScore = score;
+            const doublePointsActive = true;
+            
+            setTimeout(() => {
+                doublePointsActive = false;
+            }, 8000);
+        }
+        
+        // Activar invencibilidad
+        function activateInvincible() {
+            const originalColor = player.style.backgroundColor;
+            player.style.backgroundColor = '#00FF00';
+            player.style.boxShadow = '0 0 25px #00FF00';
+            
+            const tempShield = true;
+            
+            setTimeout(() => {
+                player.style.backgroundColor = originalColor;
+                player.style.boxShadow = '0 0 15px #4CAF50';
+                tempShield = false;
+            }, 4000);
+        }
+        
+        // Crear partículas
+        function createParticles() {
+            // Limpiar partículas existentes
+            particlesContainer.innerHTML = '';
+            
+            // Crear nuevas partículas
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 4 + 2}px`;
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`;
+                
+                // Animación
+                particle.style.animation = `float ${Math.random() * 10 + 5}s linear infinite`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        function createParticle(x, y, color) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            particle.style.backgroundColor = color;
+            particle.style.width = '5px';
+            particle.style.height = '5px';
+            
+            // Animación aleatoria
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;
+            const duration = Math.random() * 1 + 0.5;
+            
+            particle.style.transition = `all ${duration}s linear`;
+            particle.style.opacity = '1';
+            
+            particlesContainer.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.style.left = `${x + Math.cos(angle) * distance}px`;
+                particle.style.top = `${y + Math.sin(angle) * distance}px`;
+                particle.style.opacity = '0';
+                
+                // Eliminar después de la animación
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
+            }, 10);
+        }
+        
+        // Actualizar obstáculos
+        function updateObstacles() {
+            const currentTime = Date.now();
+            const timeFactor = slowmoActive ? 0.5 : 1;
+            
+            // Crear nuevos obstáculos
+            if (currentTime - lastObstacleTime > obstacleFrequency / timeFactor) {
+                createObstacle();
+                lastObstacleTime = currentTime;
+                modeChangeCounter++;
+                
+                // Cambiar modo después de X obstáculos
+                if (modeChangeCounter >= modeChangeInterval) {
+                    changeMode();
+                }
+            }
+            
+            // Crear power-ups
+            if (currentTime - lastPowerupTime > powerupFrequency) {
+                createPowerup();
+                lastPowerupTime = currentTime;
+            }
+            
+            // Mover obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                const obstacle = obstacles[i];
+                
+                if (obstacle.isHorizontal) {
+                    // Movimiento horizontal (derecha a izquierda)
+                    obstacle.x -= obstacleSpeed * timeFactor;
+                    obstacle.element.style.right = `${gameContainer.offsetWidth - obstacle.x}px`;
+                } else {
+                    // Movimiento vertical (arriba a abajo)
+                    obstacle.y += obstacleSpeed * timeFactor;
+                    obstacle.element.style.top = `${obstacle.y}px`;
+                }
+                
+                // Eliminar obstáculos que salieron de la pantalla
+                if ((obstacle.isHorizontal && obstacle.x + obstacle.width < 0) ||
+                    (!obstacle.isHorizontal && obstacle.y > gameContainer.offsetHeight)) {
+                    obstacle.element.remove();
+                    obstacles.splice(i, 1);
+                    score++;
+                    scoreDisplay.textContent = score;
+                    
+                    // Subir de nivel cada 10 puntos
+                    if (score % 10 === 0 && level < levels.length) {
+                        level++;
+                        updateLevel();
+                        
+                        // Efecto de cambio de nivel
+                        player.classList.add('shake');
+                        setTimeout(() => player.classList.remove('shake'), 500);
+                    }
+                }
+                
+                // Detectar colisiones
+                if (checkCollision(playerX, playerY, 30, 30, 
+                                 obstacle.x, obstacle.y, obstacle.width, obstacle.height)) {
+                    handleCollision();
+                }
+            }
+            
+            // Mover power-ups
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                const powerup = powerups[i];
+                
+                // Comprobar colisión con jugador
+                if (checkCollision(playerX, playerY, 30, 30, 
+                                 powerup.x, powerup.y, powerup.width, powerup.height)) {
+                    // Aplicar efecto del power-up
+                    powerup.type.effect();
+                    
+                    // Efecto visual
+                    for (let j = 0; j < 15; j++) {
+                        createParticle(
+                            powerup.x + powerup.width/2,
+                            powerup.y + powerup.height/2,
+                            powerup.type.color
+                        );
+                    }
+                    
+                    // Eliminar power-up
+                    powerup.element.remove();
+                    powerups.splice(i, 1);
+                    score += 2;
+                    scoreDisplay.textContent = score;
+                }
+            }
+        }
+        
+        // Detectar colisiones
+        function checkCollision(x1, y1, w1, h1, x2, y2, w2, h2) {
+            return x1 < x2 + w2 &&
+                   x1 + w1 > x2 &&
+                   y1 < y2 + h2 &&
+                   y1 + h1 > y2;
+        }
+        
+        // Manejar colisión
+        function handleCollision() {
+            if (hasShield) {
+                // Romper escudo
+                hasShield = false;
+                shield.style.opacity = '0';
+                player.style.boxShadow = '0 0 15px #4CAF50';
+                
+                // Efecto visual
+                for (let i = 0; i < 20; i++) {
+                    createParticle(
+                        playerX + 15,
+                        playerY + 15,
+                        '#2196F3'
+                    );
+                }
+            } else {
+                gameOver();
+            }
+        }
+        
+        // Actualizar tiempo de juego
+        function updateGameTime() {
+            const currentTime = Date.now();
+            const elapsedTime = Math.floor((currentTime - gameStartTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // Game over
+        function gameOver() {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            finalScore.textContent = score;
+            finalLevel.textContent = levels[level-1].name;
+            gameTimeDisplay.textContent = updateGameTime();
+            gameOverScreen.style.display = "flex";
+            
+            // Efecto de explosión
+            for (let i = 0; i < 30; i++) {
+                createParticle(
+                    playerX + 15,
+                    playerY + 15,
+                    '#FF0000'
+                );
+            }
+        }
+        
+        // Bucle principal del juego
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Mover jugador
+            const moveSpeed = playerSpeed * (slowmoActive ? 1.5 : 1);
+            
+            if (keys.ArrowLeft && playerX > 0) {
+                playerX -= moveSpeed;
+            }
+            if (keys.ArrowRight && playerX < gameContainer.offsetWidth - 30) {
+                playerX += moveSpeed;
+            }
+            if (keys.ArrowUp && playerY > 0) {
+                playerY -= moveSpeed;
+            }
+            if (keys.ArrowDown && playerY < gameContainer.offsetHeight - 30) {
+                playerY += moveSpeed;
+            }
+            
+            updatePlayerPosition();
+            updateShield();
+            updateObstacles();
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+        
+        // Inicializar el juego al cargar
+        window.onload = initGame;
+    </script>
+</body>
+</html>
