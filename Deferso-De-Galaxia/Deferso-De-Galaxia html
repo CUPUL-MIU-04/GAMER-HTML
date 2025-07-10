@@ -1,1 +1,996 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Defensa Galáctica Extrema</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        /* Fondo de galaxia */
+        #game-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000 url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/background.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -1;
+        }
+        
+        /* Estrellas (partículas) */
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        /* Contenedor principal */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* Menú principal */
+        #main-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 300;
+        }
+        
+        .menu-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            text-shadow: 0 0 10px #0ff;
+        }
+        
+        .menu-button {
+            background-color: transparent;
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: 12px 24px;
+            margin: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 200px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .menu-button:hover {
+            background-color: #0ff;
+            color: #000;
+        }
+        
+        /* Submenús */
+        .submenu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 400;
+        }
+        
+        .submenu-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #0ff;
+            text-shadow: 0 0 8px #0ff;
+        }
+        
+        .submenu-content {
+            max-width: 80%;
+            max-height: 60%;
+            overflow-y: auto;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 10px;
+            border: 1px solid #0ff;
+            border-radius: 5px;
+            color: #fff;
+        }
+        
+        .back-button {
+            background-color: transparent;
+            color: #0ff;
+            border: 2px solid #0ff;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-button:hover {
+            background-color: #0ff;
+            color: #000;
+        }
+        
+        /* Configuración */
+        .option-group {
+            margin: 15px 0;
+            text-align: left;
+        }
+        
+        .option-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        
+        .option-select {
+            background-color: #000;
+            color: #0ff;
+            border: 1px solid #0ff;
+            padding: 5px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* Elementos del juego */
+        #defender {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/Nave.png') no-repeat center center;
+            background-size: contain;
+            z-index: 10;
+        }
+        
+        .enemy {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/Enemigo.png') no-repeat center center;
+            background-size: contain;
+            z-index: 5;
+        }
+        
+        .bullet {
+            position: absolute;
+            width: 8px;
+            height: 20px;
+            background-color: #ff0;
+            border-radius: 4px;
+            z-index: 2;
+        }
+        
+        .player-bullet {
+            background: linear-gradient(to bottom, #ff0, #f80);
+            box-shadow: 0 0 10px #ff0;
+        }
+        
+        .enemy-bullet {
+            background: linear-gradient(to bottom, #f00, #800);
+            box-shadow: 0 0 10px #f00;
+        }
+        
+        #score {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 0 5px #0ff;
+            z-index: 20;
+        }
+        
+        #lives {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 0 5px #0ff;
+            z-index: 20;
+        }
+        
+        #level {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 0 5px #0ff;
+            z-index: 20;
+        }
+        
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #f00;
+            display: none;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 100;
+            border: 2px solid #f00;
+        }
+        
+        #level-up {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #0f0;
+            display: none;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 90;
+            animation: pulse 1s infinite;
+            border: 2px solid #0f0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        /* Controles */
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            display: none;
+            justify-content: center;
+            gap: 20px;
+            z-index: 15;
+        }
+        
+        .control-btn {
+            background-color: rgba(0, 255, 255, 0.3);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            user-select: none;
+            touch-action: manipulation;
+            border: 2px solid #0ff;
+        }
+        
+        /* Efectos */
+        .explosion {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/explosion.png') no-repeat center center;
+            background-size: contain;
+            z-index: 8;
+            animation: explode 0.5s forwards;
+        }
+        
+        @keyframes explode {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        /* Responsive */
+        @media (min-width: 768px) {
+            #controls {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fondo de galaxia -->
+    <div id="game-background"></div>
+    
+    <!-- Estrellas (partículas) -->
+    <div id="stars-container"></div>
+    
+    <div id="game-container">
+        <!-- Menú principal -->
+        <div id="main-menu">
+            <h1 class="menu-title">DEFENSA GALÁCTICA</h1>
+            <button id="start-game-btn" class="menu-button">COMENZAR</button>
+            <button id="settings-btn" class="menu-button">CONFIGURACIÓN</button>
+            <button id="credits-btn" class="menu-button">CRÉDITOS</button>
+        </div>
+        
+        <!-- Submenú de configuración -->
+        <div id="settings-menu" class="submenu">
+            <h2 class="submenu-title">CONFIGURACIÓN</h2>
+            <div class="submenu-content">
+                <div class="option-group">
+                    <label class="option-label">Sonido:</label>
+                    <select id="sound-option" class="option-select">
+                        <option value="on">Activado</option>
+                        <option value="off">Desactivado</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Controles Móvil:</label>
+                    <select id="mobile-controls" class="option-select">
+                        <option value="swipe">Deslizar (Izq/Der)</option>
+                        <option value="buttons">Botones Virtuales</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label class="option-label">Controles PC:</label>
+                    <select id="pc-controls" class="option-select">
+                        <option value="mouse">Ratón</option>
+                        <option value="keys">Teclado (Flechas)</option>
+                    </select>
+                </div>
+            </div>
+            <button id="back-from-settings" class="back-button">VOLVER</button>
+        </div>
+        
+        <!-- Submenú de créditos -->
+        <div id="credits-menu" class="submenu">
+            <h2 class="submenu-title">CRÉDITOS</h2>
+            <div class="submenu-content">
+                <p><strong>Versión:</strong> 2.0 Extrema</p>
+                <p><strong>Creador:</strong> [Tu Nombre]</p>
+                <p><strong>Plataformas:</strong> Android y Computadora</p>
+                
+                <h3>Novedades:</h3>
+                <ul style="text-align: left; padding-left: 20px;">
+                    <li>Gráficos mejorados con imágenes</li>
+                    <li>Fondo de galaxia con estrellas</li>
+                    <li>Sistema de rondas progresivas</li>
+                    <li>Menú completo con configuración</li>
+                    <li>Múltiples esquemas de control</li>
+                </ul>
+                
+                <h3>Controles:</h3>
+                <p>Móvil: Deslizar o botones virtuales</p>
+                <p>PC: Ratón o teclado (flechas)</p>
+            </div>
+            <button id="back-from-credits" class="back-button">VOLVER</button>
+        </div>
+        
+        <!-- Controles móviles -->
+        <div id="controls">
+            <div class="control-btn" id="left-btn">←</div>
+            <div class="control-btn" id="right-btn">→</div>
+        </div>
+        
+        <!-- Elementos del juego -->
+        <div id="score">Puntuación: 0</div>
+        <div id="level">Ronda: Sencillo</div>
+        <div id="lives">Vidas: ❤❤❤</div>
+        <div id="defender"></div>
+        <div id="level-up"></div>
+        <div id="game-over">
+            GAME OVER<br>
+            Puntuación: <span id="final-score">0</span><br>
+            Ronda alcanzada: <span id="final-level">Sencillo</span><br>
+            <button id="restart-button">REINICIAR</button>
+            <button id="menu-button">MENÚ</button>
+        </div>
+    </div>
 
+    <script>
+        // =============================================
+        // ELEMENTOS DEL JUEGO Y CONFIGURACIÓN
+        // =============================================
+        const gameContainer = document.getElementById('game-container');
+        const defender = document.getElementById('defender');
+        const scoreDisplay = document.getElementById('score');
+        const livesDisplay = document.getElementById('lives');
+        const levelDisplay = document.getElementById('level');
+        const gameOverDisplay = document.getElementById('game-over');
+        const levelUpDisplay = document.getElementById('level-up');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const finalLevelDisplay = document.getElementById('final-level');
+        const restartButton = document.getElementById('restart-button');
+        const menuButton = document.getElementById('menu-button');
+        const starsContainer = document.getElementById('stars-container');
+        
+        // Elementos del menú
+        const mainMenu = document.getElementById('main-menu');
+        const startGameBtn = document.getElementById('start-game-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const creditsBtn = document.getElementById('credits-btn');
+        const settingsMenu = document.getElementById('settings-menu');
+        const creditsMenu = document.getElementById('credits-menu');
+        const backFromSettings = document.getElementById('back-from-settings');
+        const backFromCredits = document.getElementById('back-from-credits');
+        
+        // Controles
+        const controls = document.getElementById('controls');
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        
+        // Opciones de configuración
+        const soundOption = document.getElementById('sound-option');
+        const mobileControls = document.getElementById('mobile-controls');
+        const pcControls = document.getElementById('pc-controls');
+        
+        // Niveles de dificultad
+        const levels = [
+            { name: "Sencillo", enemySpeed: 1.0, spawnRate: 2000, fireRate: 2000, lives: 3, scoreRequired: 100 },
+            { name: "Fácil", enemySpeed: 1.5, spawnRate: 1500, fireRate: 1500, lives: 3, scoreRequired: 200 },
+            { name: "Normal", enemySpeed: 2.0, spawnRate: 1200, fireRate: 1200, lives: 5, scoreRequired: 400 },
+            { name: "Difícil", enemySpeed: 2.5, spawnRate: 900, fireRate: 900, lives: 5, scoreRequired: 800 },
+            { name: "Ultra", enemySpeed: 3.0, spawnRate: 700, fireRate: 700, lives: 7, scoreRequired: 1500 },
+            { name: "Extremo", enemySpeed: 3.5, spawnRate: 500, fireRate: 500, lives: 10, scoreRequired: 3000 },
+            { name: "Más Extremo", enemySpeed: 4.0, spawnRate: 300, fireRate: 300, lives: 15, scoreRequired: 5000 }
+        ];
+        
+        // Configuración del jugador
+        const playerConfig = {
+            speed: 15,
+            bulletSpeed: 10,
+            fireRate: 300
+        };
+        
+        // Variables del juego
+        let score = 0;
+        let lives = 3;
+        let currentLevel = 0;
+        let gameActive = false;
+        let defenderPosition = window.innerWidth / 2;
+        let enemies = [];
+        let playerBullets = [];
+        let enemyBullets = [];
+        let gameIntervals = [];
+        let touchStartX = 0;
+        let lastTouchX = 0;
+        let isDragging = false;
+        let enemiesDestroyed = 0;
+        let moveLeft = false;
+        let moveRight = false;
+        
+        // Configuración del usuario
+        let config = {
+            sound: 'on',
+            mobileControls: 'swipe',
+            pcControls: 'mouse'
+        };
+        
+        // Detectar dispositivo
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // =============================================
+        // FUNCIONES DE INICIALIZACIÓN
+        // =============================================
+        
+        // Crear estrellas para el fondo
+        function createStars() {
+            const starsCount = 100;
+            const containerWidth = window.innerWidth;
+            const containerHeight = window.innerHeight;
+            
+            for (let i = 0; i < starsCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Tamaño aleatorio entre 1px y 3px
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                
+                // Posición aleatoria
+                star.style.left = `${Math.random() * containerWidth}px`;
+                star.style.top = `${Math.random() * containerHeight}px`;
+                
+                // Opacidad aleatoria
+                star.style.opacity = Math.random();
+                
+                // Animación de parpadeo
+                star.style.animation = `twinkle ${Math.random() * 5 + 5}s infinite alternate`;
+                
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // =============================================
+        // FUNCIONES DEL MENÚ
+        // =============================================
+        
+        function showMainMenu() {
+            mainMenu.style.display = 'flex';
+            gameOverDisplay.style.display = 'none';
+            resetGameState();
+        }
+        
+        function showSettings() {
+            mainMenu.style.display = 'none';
+            settingsMenu.style.display = 'flex';
+            
+            // Cargar configuración actual
+            soundOption.value = config.sound;
+            mobileControls.value = config.mobileControls;
+            pcControls.value = config.pcControls;
+        }
+        
+        function showCredits() {
+            mainMenu.style.display = 'none';
+            creditsMenu.style.display = 'flex';
+        }
+        
+        function backToMainMenu() {
+            settingsMenu.style.display = 'none';
+            creditsMenu.style.display = 'none';
+            mainMenu.style.display = 'flex';
+            
+            // Guardar configuración
+            config = {
+                sound: soundOption.value,
+                mobileControls: mobileControls.value,
+                pcControls: pcControls.value
+            };
+            
+            // Aplicar controles
+            setupControls();
+        }
+        
+        function startGame() {
+            mainMenu.style.display = 'none';
+            resetGame();
+        }
+        
+        // =============================================
+        // FUNCIONES DEL JUEGO
+        // =============================================
+        
+        function setupControls() {
+            // Limpiar eventos anteriores
+            gameContainer.removeEventListener('touchstart', handleTouchStart);
+            gameContainer.removeEventListener('touchmove', handleTouchMove);
+            gameContainer.removeEventListener('touchend', handleTouchEnd);
+            gameContainer.removeEventListener('mousedown', handleMouseDown);
+            gameContainer.removeEventListener('mousemove', handleMouseMove);
+            gameContainer.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('keydown', handleKeyDown);
+            document.removeEventListener('keyup', handleKeyUp);
+            leftBtn.removeEventListener('touchstart', handleLeftStart);
+            leftBtn.removeEventListener('touchend', handleLeftEnd);
+            rightBtn.removeEventListener('touchstart', handleRightStart);
+            rightBtn.removeEventListener('touchend', handleRightEnd);
+            
+            // Configurar controles para móvil
+            if (isMobile) {
+                controls.style.display = config.mobileControls === 'buttons' ? 'flex' : 'none';
+                
+                if (config.mobileControls === 'swipe') {
+                    gameContainer.addEventListener('touchstart', handleTouchStart);
+                    gameContainer.addEventListener('touchmove', handleTouchMove);
+                    gameContainer.addEventListener('touchend', handleTouchEnd);
+                } else {
+                    leftBtn.addEventListener('touchstart', handleLeftStart);
+                    leftBtn.addEventListener('touchend', handleLeftEnd);
+                    rightBtn.addEventListener('touchstart', handleRightStart);
+                    rightBtn.addEventListener('touchend', handleRightEnd);
+                }
+            } 
+            // Configurar controles para PC
+            else {
+                if (config.pcControls === 'mouse') {
+                    gameContainer.addEventListener('mousedown', handleMouseDown);
+                    gameContainer.addEventListener('mousemove', handleMouseMove);
+                    gameContainer.addEventListener('mouseup', handleMouseUp);
+                } else {
+                    document.addEventListener('keydown', handleKeyDown);
+                    document.addEventListener('keyup', handleKeyUp);
+                }
+            }
+        }
+        
+        // Control táctil (deslizar)
+        function handleTouchStart(e) {
+            if (!gameActive) return;
+            e.preventDefault();
+            touchStartX = e.touches[0].clientX;
+            lastTouchX = touchStartX;
+            isDragging = true;
+        }
+        
+        function handleTouchMove(e) {
+            if (!gameActive || !isDragging) return;
+            e.preventDefault();
+            
+            const touchX = e.touches[0].clientX;
+            const deltaX = touchX - lastTouchX;
+            
+            defenderPosition += deltaX * 1.5;
+            updateDefenderPosition();
+            
+            lastTouchX = touchX;
+        }
+        
+        function handleTouchEnd() {
+            isDragging = false;
+        }
+        
+        // Control con ratón
+        function handleMouseDown(e) {
+            if (!gameActive) return;
+            touchStartX = e.clientX;
+            lastTouchX = touchStartX;
+            isDragging = true;
+        }
+        
+        function handleMouseMove(e) {
+            if (!gameActive || !isDragging) return;
+            
+            const mouseX = e.clientX;
+            const deltaX = mouseX - lastTouchX;
+            
+            defenderPosition += deltaX * 1.5;
+            updateDefenderPosition();
+            
+            lastTouchX = mouseX;
+        }
+        
+        function handleMouseUp() {
+            isDragging = false;
+        }
+        
+        // Control con teclado
+        function handleKeyDown(e) {
+            if (!gameActive) return;
+            
+            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft = true;
+            if (e.key === 'ArrowRight' || e.key === 'd') moveRight = true;
+        }
+        
+        function handleKeyUp(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft = false;
+            if (e.key === 'ArrowRight' || e.key === 'd') moveRight = false;
+        }
+        
+        // Control con botones virtuales
+        function handleLeftStart() {
+            moveLeft = true;
+        }
+        
+        function handleLeftEnd() {
+            moveLeft = false;
+        }
+        
+        function handleRightStart() {
+            moveRight = true;
+        }
+        
+        function handleRightEnd() {
+            moveRight = false;
+        }
+        
+        // Mover defensor
+        function updateDefenderPosition() {
+            defenderPosition = Math.max(30, Math.min(window.innerWidth - 30, defenderPosition));
+            defender.style.left = `${defenderPosition - 30}px`;
+        }
+        
+        function shoot() {
+            if (!gameActive) return;
+            
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet player-bullet';
+            bullet.style.left = `${defenderPosition - 4}px`;
+            bullet.style.bottom = '80px';
+            gameContainer.appendChild(bullet);
+            
+            playerBullets.push({
+                element: bullet,
+                x: defenderPosition - 4,
+                y: window.innerHeight - 80,
+                speed: playerConfig.bulletSpeed
+            });
+        }
+        
+        function enemyShoot(enemy) {
+            if (!gameActive || Math.random() > 0.3) return;
+            
+            const bullet = document.createElement('div');
+            bullet.className = 'bullet enemy-bullet';
+            bullet.style.left = `${enemy.x + 20}px`;
+            bullet.style.top = `${enemy.y + 40}px`;
+            gameContainer.appendChild(bullet);
+            
+            enemyBullets.push({
+                element: bullet,
+                x: enemy.x + 20,
+                y: enemy.y + 40,
+                speed: levels[currentLevel].enemySpeed * 2
+            });
+        }
+        
+        function createEnemy() {
+            if (!gameActive) return;
+            
+            const enemy = document.createElement('div');
+            enemy.className = 'enemy';
+            
+            const xPos = 30 + Math.random() * (window.innerWidth - 60);
+            enemy.style.left = `${xPos}px`;
+            enemy.style.top = '-50px';
+            gameContainer.appendChild(enemy);
+            
+            const level = levels[currentLevel];
+            const health = Math.min(Math.floor(enemiesDestroyed / 20) + 1, 5);
+            
+            enemies.push({
+                element: enemy,
+                x: xPos,
+                y: -50,
+                speed: level.enemySpeed + Math.random() * (currentLevel * 0.3),
+                shootDelay: Math.floor(Math.random() * 100) + 50,
+                health: health,
+                points: health * 10 * (currentLevel + 1)
+            });
+        }
+        
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion';
+            explosion.style.left = `${x - 20}px`;
+            explosion.style.top = `${y - 20}px`;
+            gameContainer.appendChild(explosion);
+            
+            setTimeout(() => {
+                explosion.remove();
+            }, 500);
+        }
+        
+        function checkLevelUp() {
+            const nextLevel = currentLevel + 1;
+            if (nextLevel < levels.length && score >= levels[currentLevel].scoreRequired) {
+                levelUp(nextLevel);
+            }
+        }
+        
+        function levelUp(newLevel) {
+            gameActive = false;
+            clearAllIntervals();
+            
+            currentLevel = newLevel;
+            const level = levels[currentLevel];
+            
+            levelUpDisplay.textContent = `¡Ronda ${level.name}!\n+${level.lives - lives} vidas`;
+            levelUpDisplay.style.display = 'block';
+            levelDisplay.textContent = `Ronda: ${level.name}`;
+            
+            lives = level.lives;
+            updateLivesDisplay();
+            
+            setTimeout(() => {
+                levelUpDisplay.style.display = 'none';
+                gameActive = true;
+                
+                gameIntervals.push(setInterval(createEnemy, level.spawnRate));
+                updateGame();
+            }, 2000);
+        }
+        
+        function updateGame() {
+            if (!gameActive) return;
+            
+            // Disparo automático
+            if (Date.now() % playerConfig.fireRate < 20) {
+                shoot();
+            }
+            
+            // Movimiento con teclado o botones virtuales
+            if (moveLeft) defenderPosition -= playerConfig.speed;
+            if (moveRight) defenderPosition += playerConfig.speed;
+            if (moveLeft || moveRight) updateDefenderPosition();
+            
+            // Mover enemigos
+            enemies.forEach((enemy, enemyIndex) => {
+                const level = levels[currentLevel];
+                enemy.y += enemy.speed;
+                enemy.x += Math.sin(enemy.y * 0.05) * (1 + currentLevel * 0.2);
+                enemy.element.style.top = `${enemy.y}px`;
+                enemy.element.style.left = `${enemy.x}px`;
+                
+                enemy.shootDelay--;
+                if (enemy.shootDelay <= 0) {
+                    enemyShoot(enemy);
+                    enemy.shootDelay = Math.floor(Math.random() * 100) + (200 - currentLevel * 20);
+                }
+                
+                if (enemy.y > window.innerHeight - 100 && 
+                    enemy.x > defenderPosition - 30 && 
+                    enemy.x < defenderPosition + 30) {
+                    createExplosion(enemy.x, enemy.y);
+                    takeDamage();
+                    enemy.element.remove();
+                    enemies.splice(enemyIndex, 1);
+                }
+                
+                if (enemy.y > window.innerHeight + 30) {
+                    enemy.element.remove();
+                    enemies.splice(enemyIndex, 1);
+                }
+            });
+            
+            // Mover balas del jugador
+            playerBullets.forEach((bullet, bulletIndex) => {
+                bullet.y -= bullet.speed;
+                bullet.element.style.bottom = `${window.innerHeight - bullet.y}px`;
+                
+                enemies.forEach((enemy, enemyIndex) => {
+                    if (Math.abs(bullet.x - enemy.x) < 30 && 
+                        Math.abs(bullet.y - enemy.y) < 30) {
+                        enemy.health--;
+                        
+                        if (enemy.health <= 0) {
+                            createExplosion(enemy.x, enemy.y);
+                            enemy.element.remove();
+                            enemies.splice(enemyIndex, 1);
+                            score += enemy.points;
+                            enemiesDestroyed++;
+                            scoreDisplay.textContent = `Puntuación: ${score}`;
+                            checkLevelUp();
+                        }
+                        
+                        bullet.element.remove();
+                        playerBullets.splice(bulletIndex, 1);
+                    }
+                });
+                
+                if (bullet.y < 0) {
+                    bullet.element.remove();
+                    playerBullets.splice(bulletIndex, 1);
+                }
+            });
+            
+            // Mover balas enemigas
+            enemyBullets.forEach((bullet, bulletIndex) => {
+                bullet.y += bullet.speed;
+                bullet.element.style.top = `${bullet.y}px`;
+                
+                if (bullet.y > window.innerHeight - 100 && 
+                    bullet.x > defenderPosition - 30 && 
+                    bullet.x < defenderPosition + 30) {
+                    createExplosion(bullet.x, bullet.y);
+                    takeDamage();
+                    bullet.element.remove();
+                    enemyBullets.splice(bulletIndex, 1);
+                }
+                
+                if (bullet.y > window.innerHeight) {
+                    bullet.element.remove();
+                    enemyBullets.splice(bulletIndex, 1);
+                }
+            });
+            
+            requestAnimationFrame(updateGame);
+        }
+        
+        function takeDamage() {
+            lives--;
+            updateLivesDisplay();
+            
+            defender.style.filter = 'brightness(2)';
+            setTimeout(() => {
+                if (gameActive) defender.style.filter = 'brightness(1)';
+            }, 200);
+            
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+        
+        function updateLivesDisplay() {
+            let livesText = 'Vidas: ';
+            for (let i = 0; i < levels[currentLevel].lives; i++) {
+                livesText += i < lives ? '❤' : '♡';
+            }
+            livesDisplay.textContent = livesText;
+        }
+        
+        function gameOver() {
+            gameActive = false;
+            clearAllIntervals();
+            finalScoreDisplay.textContent = score;
+            finalLevelDisplay.textContent = levels[currentLevel].name;
+            gameOverDisplay.style.display = 'block';
+        }
+        
+        function clearAllIntervals() {
+            gameIntervals.forEach(interval => clearInterval(interval));
+            gameIntervals = [];
+        }
+        
+        function resetGameState() {
+            enemies.forEach(enemy => enemy.element.remove());
+            playerBullets.forEach(bullet => bullet.element.remove());
+            enemyBullets.forEach(bullet => bullet.element.remove());
+            
+            enemies = [];
+            playerBullets = [];
+            enemyBullets = [];
+            score = 0;
+            currentLevel = 0;
+            enemiesDestroyed = 0;
+            lives = levels[currentLevel].lives;
+            
+            scoreDisplay.textContent = `Puntuación: ${score}`;
+            levelDisplay.textContent = `Ronda: ${levels[currentLevel].name}`;
+            updateLivesDisplay();
+            
+            defenderPosition = window.innerWidth / 2;
+            defender.style.left = `${defenderPosition - 30}px`;
+            defender.style.filter = 'brightness(1)';
+        }
+        
+        function resetGame() {
+            resetGameState();
+            gameOverDisplay.style.display = 'none';
+            levelUpDisplay.style.display = 'none';
+            gameActive = true;
+            
+            clearAllIntervals();
+            gameIntervals.push(setInterval(createEnemy, levels[currentLevel].spawnRate));
+            
+            updateGame();
+        }
+        
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+        
+        // Menú principal
+        startGameBtn.addEventListener('click', startGame);
+        settingsBtn.addEventListener('click', showSettings);
+        creditsBtn.addEventListener('click', showCredits);
+        
+        // Submenús
+        backFromSettings.addEventListener('click', backToMainMenu);
+        backFromCredits.addEventListener('click', backToMainMenu);
+        
+        // Juego
+        restartButton.addEventListener('click', resetGame);
+        menuButton.addEventListener('click', showMainMenu);
+        
+        // Inicializar el juego
+        createStars();
+        setupControls();
+        showMainMenu();
+    </script>
+</body>
+</html>
