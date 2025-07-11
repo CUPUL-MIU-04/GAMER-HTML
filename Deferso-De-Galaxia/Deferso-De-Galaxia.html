@@ -12,6 +12,7 @@
             padding: 0;
             overflow: hidden;
             touch-action: manipulation;
+            background: #000;
         }
         
         /* Fondo de galaxia */
@@ -32,6 +33,12 @@
             background: #fff;
             border-radius: 50%;
             z-index: 0;
+            animation: twinkle 5s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
         }
         
         /* Contenedor principal */
@@ -160,7 +167,7 @@
         /* Elementos del juego */
         #defender {
             position: absolute;
-            bottom: 50px;
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%);
             width: 60px;
@@ -174,28 +181,65 @@
             position: absolute;
             width: 50px;
             height: 50px;
-            background: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/refs/heads/master/Deferso-De-Galaxia/assets/Nave0.png') no-repeat center center;
             background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             z-index: 5;
+        }
+        
+        .enemy-type1 {
+            background-image: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/Enemigo.png');
+        }
+        
+        .enemy-type2 {
+            background-image: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/Enemigo2.png');
+        }
+        
+        .enemy-type3 {
+            background-image: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/Enemigo3.png');
         }
         
         .bullet {
             position: absolute;
-            width: 8px;
-            height: 20px;
-            background-color: #ff0;
-            border-radius: 4px;
             z-index: 2;
         }
         
         .player-bullet {
+            width: 8px;
+            height: 20px;
             background: linear-gradient(to bottom, #ff0, #f80);
             box-shadow: 0 0 10px #ff0;
+            border-radius: 4px;
+        }
+        
+        .player-special-bullet {
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle, #f00, #800);
+            box-shadow: 0 0 15px #f00;
+            border-radius: 50%;
         }
         
         .enemy-bullet {
+            width: 8px;
+            height: 20px;
             background: linear-gradient(to bottom, #f00, #800);
             box-shadow: 0 0 10px #f00;
+            border-radius: 4px;
+        }
+        
+        .fireball {
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #f80, #f00);
+            box-shadow: 0 0 20px #f80;
+            border-radius: 50%;
+            animation: pulse-fireball 0.5s infinite alternate;
+        }
+        
+        @keyframes pulse-fireball {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
         }
         
         #score {
@@ -226,6 +270,16 @@
             font-size: 18px;
             color: #fff;
             text-shadow: 0 0 5px #0ff;
+            z-index: 20;
+        }
+        
+        #weapon-info {
+            position: absolute;
+            top: 40px;
+            left: 10px;
+            font-size: 16px;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
             z-index: 20;
         }
         
@@ -297,8 +351,8 @@
         /* Efectos */
         .explosion {
             position: absolute;
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             background: url('https://raw.githubusercontent.com/CUPUL-MIU-04/GAMER-HTML/master/Deferso-De-Galaxia/assets/explosion.png') no-repeat center center;
             background-size: contain;
             z-index: 8;
@@ -369,17 +423,17 @@
         <div id="credits-menu" class="submenu">
             <h2 class="submenu-title">CRÉDITOS</h2>
             <div class="submenu-content">
-                <p><strong>Versión:</strong> 2.0 Extrema</p>
+                <p><strong>Versión:</strong> 3.0 - Sistema de Armas</p>
                 <p><strong>Creador:</strong> [Luis04]</p>
                 <p><strong>Plataformas:</strong> Android y Computadora</p>
                 
                 <h3>Novedades:</h3>
                 <ul style="text-align: left; padding-left: 20px;">
-                    <li>Gráficos mejorados con imágenes</li>
-                    <li>Fondo de galaxia con estrellas</li>
-                    <li>Sistema de rondas progresivas</li>
-                    <li>Menú completo con configuración</li>
-                    <li>Múltiples esquemas de control</li>
+                    <li>Sistema de armas especiales</li>
+                    <li>3 tipos de enemigos con diferentes ataques</li>
+                    <li>Efectos visuales mejorados</li>
+                    <li>Posición de nave ajustada</li>
+                    <li>Dificultad balanceada</li>
                 </ul>
                 
                 <h3>Controles:</h3>
@@ -399,6 +453,7 @@
         <div id="score">Puntuación: 0</div>
         <div id="level">Ronda: Sencillo</div>
         <div id="lives">Vidas: ❤❤❤</div>
+        <div id="weapon-info">Arma: Básica</div>
         <div id="defender"></div>
         <div id="level-up"></div>
         <div id="game-over">
@@ -419,6 +474,7 @@
         const scoreDisplay = document.getElementById('score');
         const livesDisplay = document.getElementById('lives');
         const levelDisplay = document.getElementById('level');
+        const weaponInfo = document.getElementById('weapon-info');
         const gameOverDisplay = document.getElementById('game-over');
         const levelUpDisplay = document.getElementById('level-up');
         const finalScoreDisplay = document.getElementById('final-score');
@@ -462,7 +518,10 @@
         const playerConfig = {
             speed: 15,
             bulletSpeed: 10,
-            fireRate: 300
+            fireRate: 300,
+            weapon: 'basic', // basic, triple, fire, machinegun
+            weaponDuration: 0,
+            weaponCooldown: 0
         };
         
         // Variables del juego
@@ -481,6 +540,7 @@
         let enemiesDestroyed = 0;
         let moveLeft = false;
         let moveRight = false;
+        let lastShotTime = 0;
         
         // Configuración del usuario
         let config = {
@@ -518,8 +578,8 @@
                 // Opacidad aleatoria
                 star.style.opacity = Math.random();
                 
-                // Animación de parpadeo
-                star.style.animation = `twinkle ${Math.random() * 5 + 5}s infinite alternate`;
+                // Animación de parpadeo con duración aleatoria
+                star.style.animationDuration = `${Math.random() * 5 + 5}s`;
                 
                 starsContainer.appendChild(star);
             }
@@ -707,42 +767,163 @@
         function shoot() {
             if (!gameActive) return;
             
+            const now = Date.now();
+            if (now - lastShotTime < playerConfig.fireRate) return;
+            lastShotTime = now;
+            
+            // Actualizar estado del arma
+            updateWeaponState();
+            
+            // Disparo según el arma actual
+            switch(playerConfig.weapon) {
+                case 'triple':
+                    shootTriple();
+                    break;
+                case 'fire':
+                    shootFire();
+                    break;
+                case 'machinegun':
+                    shootMachinegun();
+                    break;
+                default: // basic
+                    shootBasic();
+                    break;
+            }
+        }
+        
+        function shootBasic() {
+            createPlayerBullet(defenderPosition, 'basic');
+        }
+        
+        function shootTriple() {
+            createPlayerBullet(defenderPosition - 20, 'triple');
+            createPlayerBullet(defenderPosition, 'triple');
+            createPlayerBullet(defenderPosition + 20, 'triple');
+        }
+        
+        function shootFire() {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createPlayerBullet(defenderPosition - 15 + (i * 15), 'fire');
+                }, i * 100);
+            }
+        }
+        
+        function shootMachinegun() {
+            createPlayerBullet(defenderPosition - 10 + Math.random() * 20, 'machinegun');
+        }
+        
+        function createPlayerBullet(x, weaponType) {
             const bullet = document.createElement('div');
-            bullet.className = 'bullet player-bullet';
-            bullet.style.left = `${defenderPosition - 4}px`;
-            bullet.style.bottom = '80px';
+            
+            if (weaponType === 'fire') {
+                bullet.className = 'bullet player-special-bullet fireball';
+            } else if (weaponType === 'triple') {
+                bullet.className = 'bullet player-special-bullet';
+            } else {
+                bullet.className = 'bullet player-bullet';
+            }
+            
+            bullet.style.left = `${x - 4}px`;
+            bullet.style.bottom = '90px';
             gameContainer.appendChild(bullet);
             
             playerBullets.push({
                 element: bullet,
-                x: defenderPosition - 4,
-                y: window.innerHeight - 80,
-                speed: playerConfig.bulletSpeed
+                x: x - 4,
+                y: window.innerHeight - 90,
+                speed: playerConfig.bulletSpeed * (weaponType === 'machinegun' ? 1.5 : 1),
+                damage: weaponType === 'fire' ? 3 : 1,
+                weaponType: weaponType
             });
         }
         
-        function enemyShoot(enemy) {
+        function updateWeaponState() {
+            // Reducir duración del arma especial
+            if (playerConfig.weapon !== 'basic') {
+                playerConfig.weaponDuration -= playerConfig.fireRate;
+                
+                if (playerConfig.weaponDuration <= 0) {
+                    playerConfig.weapon = 'basic';
+                    playerConfig.weaponCooldown = 5000; // 5 segundos de cooldown
+                    weaponInfo.textContent = "Arma: Básica";
+                    weaponInfo.style.color = "#0f0";
+                }
+            }
+            // Reducir cooldown
+            else if (playerConfig.weaponCooldown > 0) {
+                playerConfig.weaponCooldown -= playerConfig.fireRate;
+            }
+        }
+        
+        function enemyShoot(enemy, enemyType) {
             if (!gameActive || Math.random() > 0.3) return;
             
+            // Disparo según tipo de enemigo
+            if (enemyType === 1) { // [{§}] - Disparo triple
+                createEnemyBullet(enemy.x + 20, enemy.y + 40, -15);
+                createEnemyBullet(enemy.x + 20, enemy.y + 40, 0);
+                createEnemyBullet(enemy.x + 20, enemy.y + 40, 15);
+            } 
+            else if (enemyType === 2) { // [ × ] - Línea de bolas de fuego
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        createEnemyFireball(enemy.x + 20, enemy.y + 40);
+                    }, i * 200);
+                }
+            }
+            else { // (@) - Metralleta
+                createEnemyBullet(enemy.x + 20, enemy.y + 40, Math.random() * 30 - 15);
+            }
+        }
+        
+        function createEnemyBullet(x, y, angleOffset = 0) {
             const bullet = document.createElement('div');
             bullet.className = 'bullet enemy-bullet';
-            bullet.style.left = `${enemy.x + 20}px`;
-            bullet.style.top = `${enemy.y + 40}px`;
+            bullet.style.left = `${x}px`;
+            bullet.style.top = `${y}px`;
             gameContainer.appendChild(bullet);
             
             enemyBullets.push({
                 element: bullet,
-                x: enemy.x + 20,
-                y: enemy.y + 40,
-                speed: levels[currentLevel].enemySpeed * 2
+                x: x,
+                y: y,
+                speed: levels[currentLevel].enemySpeed * 2,
+                angleOffset: angleOffset
+            });
+        }
+        
+        function createEnemyFireball(x, y) {
+            const fireball = document.createElement('div');
+            fireball.className = 'bullet fireball';
+            fireball.style.left = `${x}px`;
+            fireball.style.top = `${y}px`;
+            gameContainer.appendChild(fireball);
+            
+            enemyBullets.push({
+                element: fireball,
+                x: x,
+                y: y,
+                speed: levels[currentLevel].enemySpeed * 1.5,
+                angleOffset: 0,
+                isFireball: true
             });
         }
         
         function createEnemy() {
             if (!gameActive) return;
             
+            const enemyTypes = [
+                { class: 'enemy-type1', type: 1, health: 2 }, // [{§}] - Triple disparo
+                { class: 'enemy-type2', type: 2, health: 3 }, // [ × ] - Bolas de fuego
+                { class: 'enemy-type3', type: 3, health: 1 }  // (@) - Metralleta
+            ];
+            
+            const typeIndex = Math.min(Math.floor(enemiesDestroyed / 15), enemyTypes.length - 1);
+            const enemyType = enemyTypes[typeIndex];
+            
             const enemy = document.createElement('div');
-            enemy.className = 'enemy';
+            enemy.className = `enemy ${enemyType.class}`;
             
             const xPos = 30 + Math.random() * (window.innerWidth - 60);
             enemy.style.left = `${xPos}px`;
@@ -750,7 +931,7 @@
             gameContainer.appendChild(enemy);
             
             const level = levels[currentLevel];
-            const health = Math.min(Math.floor(enemiesDestroyed / 20) + 1, 5);
+            const health = enemyType.health + Math.floor(enemiesDestroyed / 30);
             
             enemies.push({
                 element: enemy,
@@ -759,15 +940,17 @@
                 speed: level.enemySpeed + Math.random() * (currentLevel * 0.3),
                 shootDelay: Math.floor(Math.random() * 100) + 50,
                 health: health,
-                points: health * 10 * (currentLevel + 1)
+                points: health * 15 * (currentLevel + 1),
+                type: enemyType.type
             });
         }
         
-        function createExplosion(x, y) {
+        function createExplosion(x, y, size = 1) {
             const explosion = document.createElement('div');
             explosion.className = 'explosion';
-            explosion.style.left = `${x - 20}px`;
-            explosion.style.top = `${y - 20}px`;
+            explosion.style.left = `${x - 30 * size}px`;
+            explosion.style.top = `${y - 30 * size}px`;
+            explosion.style.transform = `scale(${size})`;
             gameContainer.appendChild(explosion);
             
             setTimeout(() => {
@@ -796,6 +979,13 @@
             lives = level.lives;
             updateLivesDisplay();
             
+            // Dar arma especial al subir de nivel
+            const weapons = ['triple', 'fire', 'machinegun'];
+            const randomWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+            playerConfig.weapon = randomWeapon;
+            playerConfig.weaponDuration = 10000; // 10 segundos
+            updateWeaponDisplay(randomWeapon);
+            
             setTimeout(() => {
                 levelUpDisplay.style.display = 'none';
                 gameActive = true;
@@ -805,13 +995,31 @@
             }, 2000);
         }
         
+        function updateWeaponDisplay(weapon) {
+            switch(weapon) {
+                case 'triple':
+                    weaponInfo.textContent = "Arma: Triple Disparo";
+                    weaponInfo.style.color = "#00ffff";
+                    break;
+                case 'fire':
+                    weaponInfo.textContent = "Arma: Bolas de Fuego";
+                    weaponInfo.style.color = "#ff8000";
+                    break;
+                case 'machinegun':
+                    weaponInfo.textContent = "Arma: Metralleta";
+                    weaponInfo.style.color = "#ffff00";
+                    break;
+                default:
+                    weaponInfo.textContent = "Arma: Básica";
+                    weaponInfo.style.color = "#0f0";
+            }
+        }
+        
         function updateGame() {
             if (!gameActive) return;
             
             // Disparo automático
-            if (Date.now() % playerConfig.fireRate < 20) {
-                shoot();
-            }
+            shoot();
             
             // Movimiento con teclado o botones virtuales
             if (moveLeft) defenderPosition -= playerConfig.speed;
@@ -828,14 +1036,14 @@
                 
                 enemy.shootDelay--;
                 if (enemy.shootDelay <= 0) {
-                    enemyShoot(enemy);
+                    enemyShoot(enemy, enemy.type);
                     enemy.shootDelay = Math.floor(Math.random() * 100) + (200 - currentLevel * 20);
                 }
                 
                 if (enemy.y > window.innerHeight - 100 && 
                     enemy.x > defenderPosition - 30 && 
                     enemy.x < defenderPosition + 30) {
-                    createExplosion(enemy.x, enemy.y);
+                    createExplosion(enemy.x, enemy.y, 1.5);
                     takeDamage();
                     enemy.element.remove();
                     enemies.splice(enemyIndex, 1);
@@ -855,15 +1063,25 @@
                 enemies.forEach((enemy, enemyIndex) => {
                     if (Math.abs(bullet.x - enemy.x) < 30 && 
                         Math.abs(bullet.y - enemy.y) < 30) {
-                        enemy.health--;
+                        enemy.health -= bullet.damage;
                         
                         if (enemy.health <= 0) {
-                            createExplosion(enemy.x, enemy.y);
+                            createExplosion(enemy.x, enemy.y, 1.2);
                             enemy.element.remove();
                             enemies.splice(enemyIndex, 1);
                             score += enemy.points;
                             enemiesDestroyed++;
                             scoreDisplay.textContent = `Puntuación: ${score}`;
+                            
+                            // Posibilidad de obtener arma especial al destruir enemigos
+                            if (playerConfig.weapon === 'basic' && playerConfig.weaponCooldown <= 0 && Math.random() < 0.2) {
+                                const weapons = ['triple', 'fire', 'machinegun'];
+                                const randomWeapon = weapons[Math.floor(Math.random() * weapons.length)];
+                                playerConfig.weapon = randomWeapon;
+                                playerConfig.weaponDuration = 8000; // 8 segundos
+                                updateWeaponDisplay(randomWeapon);
+                            }
+                            
                             checkLevelUp();
                         }
                         
@@ -880,13 +1098,19 @@
             
             // Mover balas enemigas
             enemyBullets.forEach((bullet, bulletIndex) => {
+                // Aplicar movimiento con ángulo si tiene offset
+                if (bullet.angleOffset) {
+                    bullet.x += bullet.angleOffset * 0.1;
+                }
+                
                 bullet.y += bullet.speed;
                 bullet.element.style.top = `${bullet.y}px`;
+                bullet.element.style.left = `${bullet.x}px`;
                 
                 if (bullet.y > window.innerHeight - 100 && 
                     bullet.x > defenderPosition - 30 && 
                     bullet.x < defenderPosition + 30) {
-                    createExplosion(bullet.x, bullet.y);
+                    createExplosion(bullet.x, bullet.y, bullet.isFireball ? 1.3 : 0.8);
                     takeDamage();
                     bullet.element.remove();
                     enemyBullets.splice(bulletIndex, 1);
@@ -949,8 +1173,15 @@
             enemiesDestroyed = 0;
             lives = levels[currentLevel].lives;
             
+            // Resetear arma
+            playerConfig.weapon = 'basic';
+            playerConfig.weaponDuration = 0;
+            playerConfig.weaponCooldown = 0;
+            
             scoreDisplay.textContent = `Puntuación: ${score}`;
             levelDisplay.textContent = `Ronda: ${levels[currentLevel].name}`;
+            weaponInfo.textContent = "Arma: Básica";
+            weaponInfo.style.color = "#0f0";
             updateLivesDisplay();
             
             defenderPosition = window.innerWidth / 2;
